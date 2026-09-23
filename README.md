@@ -22,6 +22,24 @@ templates/spec.md  새 기능 spec 템플릿
 assets/tokens.css  앱 색 토큰 (scripts/sync-tokens.py 가 생성)
 ```
 
+## 어디에 두나
+
+| 무엇 | 어디 |
+|---|---|
+| 기능 하나의 기획·결정·미결 | `features/<slug>/spec.md` |
+| 기능 하나의 화면 | `features/<slug>/mockup.html` |
+| 여러 기능에 걸친 정책 | `policy/<주제>.md`. 없으면 그때 새로 만든다(예: `community.md`, `notification.md`) |
+| 디자인 규칙(색 쓰는 법, 폰트, 표시 관례) | `policy/design.md` |
+| 색 값 자체 | 앱 `AppColors`(모바일 레포 PR) → `sync-tokens.py`로 `tokens.css` 갱신 |
+| Figma 시안과 코멘트 | Figma에 둔다. 거기서 정해진 것은 spec이나 policy로 옮겨 적는다 |
+| 이미 있는 API | 모바일 레포 `docs/api-reference.md`(자동 생성)를 보고 spec에 링크한다 |
+| 약관·개인정보처리방침 | 모바일 레포 `docs/policies/`. 앱이 링크하는 법적 문서라 옮기지 않는다 |
+| 지금 코드가 어떻게 동작하는지 | 모바일 레포 `wiki/` |
+
+- **spec인지 policy인지**: 결정이 한 기능 안에서만 쓰이면 spec에 둔다. 두 번째 기능에서도 쓰이게 되면 policy로 옮기고, spec에는 링크만 남긴다.
+- **결정이 바뀌면**: 그 줄을 고치고 날짜를 새로 쓴다. 이전 결정은 git 기록에 남는다. 뒤집은 이유가 중요하면 "(이전: …)"을 붙인다.
+- **슬랙·Figma·개인 위키에서 정한 것**은 여기 PR로 올라와야 확정이다.
+
 ## 보는 법
 
 - **main**: https://nar-gg.github.io/warding-docs/ (md도 페이지로 렌더된다)
