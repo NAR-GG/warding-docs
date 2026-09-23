@@ -32,7 +32,7 @@ assets/tokens.css  앱 색 토큰 (scripts/sync-tokens.py 가 생성)
 | 디자인 규칙(색 쓰는 법, 폰트, 표시 관례) | `policy/design.md` |
 | 색 값 자체 | 앱 `AppColors`(모바일 레포 PR) → `sync-tokens.py`로 `tokens.css` 갱신 |
 | Figma 시안과 코멘트 | Figma에 둔다. 거기서 정해진 것은 spec이나 policy로 옮겨 적는다 |
-| 이미 있는 API | 모바일 레포 `docs/api-reference.md`(자동 생성)를 보고 spec에 링크한다 |
+| 이미 있는 API | 백엔드 코드가 기준이다. 모바일 `docs/api-reference.md`는 Swagger 요약이라 `@Hidden` 컨트롤러(뉴스 등)가 빠지고, `/sync-api-docs`로 수동 갱신할 때만 바뀐다. 찾는 법은 [CLAUDE.md](CLAUDE.md) "기획" 절 |
 | 약관·개인정보처리방침 | 모바일 레포 `docs/policies/`. 앱이 링크하는 법적 문서라 옮기지 않는다 |
 | 지금 코드가 어떻게 동작하는지 | 모바일 레포 `wiki/` |
 
