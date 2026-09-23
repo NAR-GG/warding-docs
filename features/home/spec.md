@@ -48,9 +48,9 @@
 | 순위 | `/api/standings` | 있음. LCK만 준다 |
 | 커뮤니티 글 | `/api/mobile/community/posts?sort=hot\|latest` | 있음 |
 | 공지 | `/api/notices` | 있음 |
-| 쇼츠 | `/api/videos?category=shorts&sort=latest\|popular` | 있음. `ChannelType.SHORTS` 채널을 동기화하고 있다 |
+| 쇼츠 | `/api/story/videos?category=shorts&sort=latest` | 있음. 정렬은 `latest\|views\|likes`, 기간은 `period=all\|week\|month`. `ChannelType.SHORTS` 채널을 동기화하고 있다 |
 | 선수 이미지 | `/api/players/cards`의 `playerImageUrl` | 있음 |
-| 뉴스 | `/api/community/news` | 있음. 다만 TOP 5 고정이고 LoL 필터가 없다 |
+| 뉴스 | `/api/community/news` | 있음. 다만 TOP 5 고정이고 LoL 필터가 없다. `@Hidden`이라 Swagger와 `api-reference.md`에는 안 나온다 |
 | 솔랭 상태(`gameStartTime`·챔피언·직전 결과) | 솔랭 DTO | 새로. 지금 DTO가 이 값을 버리고 있어서 필드만 추가하면 된다 |
 | 평점 최근순(여러 경기에 걸친 목록) | — | 새로. 지금은 `/api/mobile/live/games/{gameId}/ratings`처럼 경기 단위로만 조회된다 |
 | 홈 한 번에 받기 | `GET /api/mobile/home` | 새로. 위 다섯 섹션과 솔랭 상태를 한 번에 준다 |
