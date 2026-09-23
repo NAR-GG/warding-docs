@@ -24,5 +24,5 @@ Warding 앱의 기획·디자인 초안 레포다. 코드는 두지 않는다. �
 ## 작업 흐름
 
 - `main`에 직접 커밋하지 않는다. `feat/<slug>` 브랜치에서 PR을 올린다.
-- PR 본문의 프리뷰 링크 칸을 채운다. `https://raw.githack.com/NAR-GG/warding-docs/<브랜치>/<경로>` 형식이다.
+- PR 본문의 프리뷰 링크 칸을 채운다. `https://htmlpreview.github.io/?https://github.com/NAR-GG/warding-docs/blob/<브랜치>/<경로>` 형식이다.
 - 새 기능을 추가하면 `README.md`의 목록 표에 한 줄을 넣는다.

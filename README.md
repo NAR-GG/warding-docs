@@ -25,7 +25,7 @@ assets/tokens.css  앱 색 토큰 (scripts/sync-tokens.py 가 생성)
 ## 보는 법
 
 - **main**: https://nar-gg.github.io/warding-docs/ (md도 페이지로 렌더된다)
-- **PR 브랜치**: `https://raw.githack.com/NAR-GG/warding-docs/<브랜치>/features/<slug>/mockup.html`
+- **PR 브랜치**: `https://htmlpreview.github.io/?https://github.com/NAR-GG/warding-docs/blob/<브랜치>/features/<slug>/mockup.html`
   PR 본문 템플릿에 이 링크를 넣는 칸이 있다.
 
 ## 새 기능 시작하기
@@ -45,3 +45,4 @@ python3 scripts/sync-tokens.py
 
 | 기능 | 상태 |
 |---|---|
+| [홈 화면 개편](features/home/spec.md) · [목업](features/home/mockup.html) | 초안 |

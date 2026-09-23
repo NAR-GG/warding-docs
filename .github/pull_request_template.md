@@ -4,7 +4,7 @@
 
 ## 프리뷰
 
-<!-- https://raw.githack.com/NAR-GG/warding-docs/<브랜치>/features/<slug>/mockup.html -->
+<!-- https://htmlpreview.github.io/?https://github.com/NAR-GG/warding-docs/blob/<브랜치>/features/<slug>/mockup.html -->
 
 ## 작성자 / 리뷰어
 
