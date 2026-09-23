@@ -45,3 +45,4 @@ python3 scripts/sync-tokens.py
 
 | 기능 | 상태 |
 |---|---|
+| [홈 화면 개편](features/home/spec.md) · [목업](features/home/mockup.html) | 초안 |
