@@ -8,7 +8,7 @@
 | 목업 | [mockup.html](mockup.html) (v29, 2026-09-23) |
 | Figma | (링크 필요) |
 
-결정과 미결은 이 파일에만 적는다. `mockup.html` 아래쪽 노트는 v29 시점의 사본이다. 그중 "뉴스 섹션" 카드의 "뉴스·쇼츠·평점 세 탭" 문구는 이전 안을 기준으로 쓴 것이다. 지금은 아래 결정대로 콘텐츠(뉴스·쇼츠)와 커뮤니티(글·평점)로 나뉘어 있다.
+결정과 미결은 이 파일에만 적는다. `mockup.html` 아래쪽 노트는 v29 시점의 사본이다. 그중 "뉴스 섹션" 카드의 "뉴스·쇼츠·평점 세 탭" 문구는 이전 안을 기준으로 쓴 것이다. 지금은 아래 결정대로 콘텐츠(뉴스·쇼츠)와 커뮤니티(글·평점)로 나뉘어 있다. 노트의 "데이터 준비 상태"에 적힌 API 중 쇼츠 경로·정렬값과 커뮤니티 인기순은 틀렸다. 아래 표가 백엔드 코드와 대조한 값이다(2026-09-24).
 
 ## 목적
 
@@ -46,7 +46,8 @@
 |---|---|---|
 | 오늘 경기 | `/api/schedule` | 있음 |
 | 순위 | `/api/standings` | 있음. LCK만 준다 |
-| 커뮤니티 글 | `/api/mobile/community/posts?sort=hot\|latest` | 있음 |
+| 커뮤니티 글(최신순) | `/api/mobile/community/posts` (cursor 페이징) | 있음 |
+| 커뮤니티 글(인기순) | — | 새로. 지금 엔드포인트에는 정렬 파라미터가 없다 |
 | 공지 | `/api/notices` | 있음 |
 | 쇼츠 | `/api/story/videos?category=shorts&sort=latest` | 있음. 정렬은 `latest\|views\|likes`, 기간은 `period=all\|week\|month`. `ChannelType.SHORTS` 채널을 동기화하고 있다 |
 | 선수 이미지 | `/api/players/cards`의 `playerImageUrl` | 있음 |
