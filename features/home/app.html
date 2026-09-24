@@ -327,7 +327,7 @@ h1{font-size:24px;margin:0 0 6px}
         </div>
         <div class="toast" id="toast"></div>
       </div>
-      <p class="foot">인기순은 최근 7일 (좋아요 + 댓글) 순이다(2026-09-25 결정). 예시로 4건을 채웠지만, 2026-09-25 prod 기준 최근 7일 글은 1건이라 실제로는 1건만 보인다.</p>
+      <p class="foot">커뮤니티 인기순 탭은 뺀 모습이다(2026-09-25 결정 — 최근 7일 글 1건이라 의미가 없다). 앱 #310 에는 아직 탭이 있다.</p>
     </div>
   </div>
 </div>
@@ -461,7 +461,8 @@ function renderStand(){
 function renderComm(){
   const hasReviews = !release() && REVIEWS.length;
   if (!hasReviews && st.comm==='review') st.comm='latest';
-  const tabs = [{v:'latest',label:'최신순'},{v:'hot',label:'인기순'}].concat(hasReviews?[{v:'review',label:'평점 한줄평'}]:[]);
+  // 인기순은 뺐다(2026-09-25 결정: 커뮤니티가 아직 활성화되지 않았다). 앱 #310 에는 아직 있다
+  const tabs = [{v:'latest',label:'최신순'}].concat(hasReviews?[{v:'review',label:'평점 한줄평'}]:[]);
   let body;
   if (st.comm === 'review'){
     body = REVIEWS.map(r=>`<div class="rv">${badge(r.team,28)}<div class="c"><div class="cm">${esc(r.comment)}</div>
