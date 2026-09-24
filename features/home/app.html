@@ -218,7 +218,7 @@ h1{font-size:24px;margin:0 0 6px}
 .tile .n small{font-family:var(--os);font-size:11px;font-weight:400;color:var(--narText2)}
 .tile .s{margin-top:2px;font-family:var(--os);font-size:11px;color:var(--narDark200);display:flex;align-items:center;gap:4px}
 .tile .s.live{color:var(--narSoloText)} .tile .s.w{color:var(--scoreWin)} .tile .s.l{color:var(--narText2)}
-.more{margin:9px 20px 0;height:34px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--narText2);cursor:pointer}
+.mpmore{margin:9px 20px 0;height:34px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--narText2);cursor:pointer}
 .msg{padding:40px 20px;text-align:center;font-size:13px;color:var(--narText2)}
 .foot{margin-top:10px;font-size:11.5px;color:var(--narDark200);max-width:375px;line-height:1.55}
 .toast{position:absolute;left:50%;bottom:112px;transform:translateX(-50%);background:rgba(37,38,43,.95);border:1px solid var(--narLine2);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--narText3);z-index:20;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -251,6 +251,7 @@ h1{font-size:24px;margin:0 0 6px}
         <b>앱에 아직 없는 것</b>
         <ul>
           <li>솔랭 경과 시간 카운트업 — 숫자가 멈춰 있다. 백엔드 <code>startedAt</code> 으로 가능해졌다</li>
+          <li>끝난 경기 칩의 선수 사진 — 팀 배지를 그린다. 백엔드는 <code>playerImageUrl</code> 을 주지만 앱 모델(<code>HomeFinishedSoloPlayer</code>)에 사진 필드가 없다</li>
           <li>끝난 솔랭의 KDA·"경기 결과"(5:5) — KDA 는 백엔드에 있고 5:5 는 보류</li>
           <li>뉴스 썸네일 — 회색 자리만 그린다(모델에 URL 없음)</li>
           <li>쇼츠 "내 선수" 매칭 — 영문 이름만 잡혀 한글 제목("페이커")은 안 걸린다. 그래서 prod 쇼츠로는 거의 비어 보인다</li>
@@ -519,7 +520,7 @@ function renderMyPlayers(){
       group('지금 솔랭 중', live, p=>{const l=liveBy[p.name]; return `<div class="s live"><i class="dot5"></i>${esc(l.champion)} · ${clock(l.elapsed)}</div>`;})
     + group('오늘 경기함', played, p=>{const d=doneBy[p.name]; return `<div class="s ${d.won?'w':'l'}">${ago(d.ago)} · ${d.won?'승':'패'}</div>`;})
     + group('오늘 소식 없음', quietShown, ()=>'<div class="s">오늘 경기 없음</div>', `<span>${quiet.length}명</span>`)
-    + (quiet.length>5 ? `<div class="more" data-act="mpmore">${st.mpMore?'접기':`${quiet.length-5}명 더 보기`} ${st.mpMore?'▲':'▼'}</div>` : '');
+    + (quiet.length>5 ? `<div class="mpmore" data-act="mpmore">${st.mpMore?'접기':`${quiet.length-5}명 더 보기`} ${st.mpMore?'▲':'▼'}</div>` : '');
 }
 
 /* ---------- 조립 ---------- */
