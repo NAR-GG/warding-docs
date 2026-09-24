@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warding 홈 — 앱 구현(#310) 동작</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<style>
+/* 앱 #310 에서 새로 생긴 토큰. warding-mobile-repo#310 이 머지되면 sync-tokens.py 로 tokens.css 에 들어온다 — 그때 이 블록을 지운다. */
+:root{
+  --narSoloTint:linear-gradient(90deg,rgba(232,117,88,.30),rgba(200,101,201,.26),rgba(121,27,184,.30));
+  --narSoloLine:rgba(200,101,201,.60);
+  --narSoloText:#F3BEDC;
+  --narSoloDot:#E9A0C8;
+  --narSoloHeroBg:#1B1C21;
+  --narShortsScrim:linear-gradient(0deg,rgba(11,12,14,.72) 0%,rgba(11,12,14,0) 38%);
+  --narWhite14:rgba(255,255,255,.14);
+  --ui:Pretendard,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --os:"Open Sans",Pretendard,"Noto Sans KR",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0B0C0E;color:var(--narText);font-family:var(--ui);font-size:14px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:24px;margin:0 0 6px}
+.lede{color:var(--narText2);margin:0 0 22px;max-width:76ch;font-size:13.5px}
+.lede a{color:var(--narGray400)}
+.stage{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start}
+.panel{flex:1 1 300px;max-width:420px;display:flex;flex-direction:column;gap:18px}
+.ctl h3{margin:0 0 8px;font-size:13px;color:var(--narGray400);font-weight:600}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--narLine2);color:var(--narText3);font-size:12.5px;font-weight:600;background:var(--narBgTertiary)}
+.seg button.on{background:var(--narChipSelectedBg);border-color:var(--narChipActive);color:var(--narText)}
+.ctl p{margin:6px 0 0;font-size:12px;color:var(--narDark200);line-height:1.55}
+.legend{border-top:1px solid #23252A;padding-top:14px;font-size:12px;color:var(--narText2);line-height:1.6}
+.legend b{color:var(--narText)}
+.legend ul{margin:6px 0 0;padding-left:16px}
+.legend li{margin:0 0 4px}
+.real{display:inline-block;font-family:var(--os);font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:#1f3a2a;color:#8ce99a;margin-left:4px;vertical-align:1px}
+.fake{display:inline-block;font-family:var(--os);font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:#3a2a1f;color:#ffc078;margin-left:4px;vertical-align:1px}
+
+/* phone */
+.phone{width:375px;height:812px;flex:none;background:var(--narDark800);border-radius:44px;border:1px solid #2A2C31;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+.sb{height:50px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-family:var(--os);font-weight:600;font-size:15px}
+.notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:20px;z-index:9}
+.screen{position:absolute;inset:50px 0 0 0;display:flex;flex-direction:column}
+.screen[hidden]{display:none}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding:16px 0 106px}
+.scroll::-webkit-scrollbar{display:none}
+.ico{display:inline-flex;width:24px;height:24px}
+.ico svg{width:100%;height:100%}
+
+/* top bar */
+.top{height:60px;flex:none;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.top .logo{height:20px;display:flex}
+.top .logo svg{height:20px;width:auto}
+.bell{position:relative;width:36px;height:36px;border-radius:50%;background:var(--narBgTertiary);display:grid;place-items:center;color:var(--narText)}
+.bell .ico{width:18px;height:18px}
+.bell .cnt{position:absolute;top:-2px;right:-2px;padding:1.5px 4.5px;border-radius:999px;background:var(--liveAccent);border:2px solid var(--narDark800);font-size:9.5px;font-weight:700;line-height:1.2}
+.banner{height:44px;flex:none;padding:10px 16px;background:var(--narRatingBannerBg);display:flex;align-items:center;gap:8px;cursor:pointer}
+.banner .t{flex:1;font-size:14px;font-weight:500;line-height:1.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner .x{padding-left:8px;color:var(--narText2);font-size:18px;line-height:1}
+
+/* shared */
+.gap28{height:28px}
+.sh{display:flex;align-items:baseline;padding:0 20px;min-height:20px}
+.sh .t{flex:1;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh .t small{font-size:12px;font-weight:400;color:var(--narText2)}
+.sh .go{font-size:13px;color:var(--narText2);display:flex;align-items:center;cursor:pointer}
+.chev{display:inline-block;width:16px;height:16px;position:relative}
+.chev::before{content:"";position:absolute;left:4px;top:5px;width:5px;height:5px;border-top:1.6px solid currentColor;border-right:1.6px solid currentColor;transform:rotate(45deg)}
+.chips{display:flex;gap:8px;padding:10px 20px;overflow-x:auto;scrollbar-width:none;height:54px;flex:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:34px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:500;line-height:1;display:flex;align-items:center;background:var(--narBgTertiary);border:1px solid var(--narLine2);color:var(--narText2)}
+.chip.on{background:var(--narChipSelectedBg);border-color:transparent;color:var(--narText)}
+.chip.off{background:none;border:1px dashed var(--narLine2);color:var(--narDark200);cursor:default}
+.badge{flex:none;border-radius:50%;background:var(--narDark500);display:grid;place-items:center;font-weight:700;color:var(--narText);overflow:hidden;white-space:nowrap;letter-spacing:-.02em}
+.box{margin:0 20px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:12px;overflow:hidden}
+.box > * + *{border-top:1px solid var(--narLine)}
+
+/* solo */
+.solo-empty{margin:0 20px;min-height:186px;padding:24px 18px;background:var(--narBgTertiary);border:1px dashed var(--narLine2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.solo-empty .av{width:64px;height:64px;border-radius:50%;border:1px dashed var(--narLine2);display:grid;place-items:center;color:var(--narDark400)}
+.solo-empty .m{margin-top:12px;font-size:14px;line-height:1.55;color:var(--narGray400);white-space:pre-line}
+.solo-empty .b{margin-top:14px;height:40px;padding:0 22px;border-radius:20px;background:var(--narBg);font-size:13px;font-weight:600;display:flex;align-items:center}
+.quiet{margin:0 20px;padding:14px 16px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:14px;display:flex;align-items:center;cursor:pointer}
+.quiet .c{flex:1;min-width:0}
+.quiet .t1{font-size:14.5px;font-weight:600;color:var(--narTextTertiary)}
+.quiet .t2{margin-top:4px;font-size:11.5px;color:var(--narText2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quiet .chev{color:var(--narText2)}
+.pager{height:196px;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 15px}
+.pager::-webkit-scrollbar{display:none}
+.page{flex:0 0 345px;padding:0 5px;scroll-snap-align:center}
+.hero{position:relative;width:335px;height:196px;border-radius:14px;border:1px solid var(--narLine);background:var(--narSoloHeroBg);overflow:hidden;isolation:isolate}
+.hero .splash{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
+.hero .ov{position:absolute;inset:0;background:var(--narPlayedChampOverlay)}
+.hero .photo{position:absolute;right:0;bottom:0;width:120px;height:168px;object-fit:contain;object-position:bottom center}
+.hero .champ{position:absolute;top:10px;right:10px;height:22px;padding:0 9px;border-radius:11px;background:var(--narDarkOpacity62);display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--narGray400);z-index:2}
+.dot5{width:5px;height:5px;border-radius:50%;background:var(--narSoloDot);flex:none}
+.hero .body{position:absolute;left:15px;top:13px;right:126px;bottom:13px;display:flex;flex-direction:column;z-index:2}
+.hero .team{display:flex;align-items:center;gap:6px;font-family:var(--os);font-size:12px;font-weight:600;color:var(--narGray400)}
+.hero .nick{margin-top:6px;font-size:27px;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero .clock{margin-top:8px;display:flex;align-items:flex-end;gap:8px}
+.hero .clock b{font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.hero .clock span{font-size:11px;color:var(--narText2);padding-bottom:3px}
+.hero .pill{margin-top:auto;align-self:flex-start;height:24px;padding:0 10px;border-radius:12px;background:var(--narSoloTint);border:1px solid var(--narSoloLine);display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--narSoloText)}
+.hero .pill i{width:6px;height:6px;border-radius:50%;background:var(--narSoloDot)}
+.dots{margin-top:10px;display:flex;justify-content:center;align-items:center}
+.dots i{height:5px;width:5px;border-radius:3px;margin:0 2px;background:var(--narLine2);transition:width .15s}
+.dots i.on{width:14px;background:var(--narGray400)}
+.dots em{margin-left:6px;font-style:normal;font-family:var(--os);font-size:10px;line-height:1;color:var(--narDark200)}
+.donelabel{padding:16px 20px 0;font-size:11px;font-weight:600;color:var(--narDark200)}
+.donelabel span{font-weight:400;color:var(--narDark300)}
+.strip{display:flex;gap:8px;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.done{margin-top:10px;height:44px}
+.fin{flex:none;height:44px;padding:0 11px 0 6px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:22px;display:flex;align-items:center;gap:7px}
+.fin .av{width:32px;height:32px;border-radius:50%;background:var(--narLine2);display:grid;place-items:center}
+.fin .n{font-size:12.5px;font-weight:600;color:var(--narTextTertiary)}
+.fin .n small{margin-left:5px;font-size:10px;font-weight:400;color:var(--narDark200)}
+.fin .s{margin-top:1px;font-size:10px;color:var(--narDark200)}
+.fin .s.w{color:var(--scoreWin)}
+.fin.rest{padding:0 15px;font-size:12.5px;font-weight:600;color:var(--narText2)}
+.seeall{margin:10px 20px 0;height:34px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:3px;font-size:12.5px;font-weight:600;color:var(--narText2);cursor:pointer;width:335px}
+
+/* today */
+.today{margin-top:10px;height:108px}
+.mc{flex:0 0 172px;height:108px;padding:10px 12px;border-radius:12px;background:var(--narBgTertiary);border:1px solid var(--narLine)}
+.mc.live{background:var(--narDark600);border:0;border-left:3px solid var(--liveSideBorder)}
+.mc .h{display:flex;align-items:center;gap:6px;min-width:0}
+.st{flex:none;height:22px;padding:0 8px;border-radius:8px;font-size:10px;font-weight:700;display:flex;align-items:center;background:var(--narBgTertiary);border:1px solid var(--narLine2);color:var(--narText2)}
+.st.live{background:var(--liveBadgeBg);border-color:var(--liveAccent);color:var(--liveAccent)}
+.mc .lg{font-size:11px;font-weight:600;color:var(--narText2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc .tm{display:flex;align-items:center;gap:6px;margin-top:4px}
+.mc .tm:first-of-type{margin-top:8px}
+.mc .tm .c{flex:1;font-family:var(--os);font-size:12px;font-weight:600;color:var(--narText2)}
+.mc .tm .sc{font-family:var(--os);font-size:13px;font-weight:700;color:var(--narText2)}
+.mc .tm.win .c{color:var(--narText)} .mc .tm.win .sc{color:var(--scoreWin)} .mc .tm.lose .sc{color:var(--narDark200)}
+.mc.more{border:1px dashed var(--narLine2);background:none;display:grid;place-items:center;font-size:13px;color:var(--narText2);cursor:pointer}
+
+/* standings */
+.gh{height:34px;padding:0 14px;display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--narTextTertiary)}
+.gh span{flex:1}
+.gh em{font-style:normal;font-family:var(--os);font-size:11px;font-weight:400;color:var(--narText2)}
+.gh.sub{height:30px;font-size:12px;color:var(--narGray400);border-top-color:var(--narLine2)!important}
+.tr{height:46px;padding:0 14px;display:flex;align-items:center}
+.tr .rk{width:22px;font-family:var(--os);font-size:13px;font-weight:600;color:var(--narTextTertiary)}
+.tr .tn{flex:1;min-width:0;margin-left:8px;display:flex;flex-direction:column;justify-content:center}
+.tr .tn b{font-family:var(--os);font-size:14px;font-weight:600;color:var(--narTextTertiary)}
+.tr .tn small{font-size:11px;color:var(--narText2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr .wl{width:54px;text-align:right;font-family:var(--os);font-size:14px;font-weight:700;color:var(--narTextTertiary)}
+.tr .wl i{font-style:normal;font-weight:400;color:var(--narDark200)}
+.tr .sd{width:44px;text-align:right;font-family:var(--os);font-size:12px;color:var(--narText3)}
+.tr .sd.p{color:var(--scoreWin)}
+.xp{height:40px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:13px;color:var(--narText2);cursor:pointer}
+
+/* community */
+.post{padding:11px 14px;display:flex;align-items:center}
+.post .rk{width:18px;text-align:center;font-family:var(--os);font-size:13px;font-weight:700;color:var(--narDark200);margin-right:8px}
+.post .c{flex:1;min-width:0;margin-left:10px}
+.post .ti{font-size:14px;font-weight:500;color:var(--narTextTertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post .me{margin-top:2px;font-size:11px;color:var(--narText2)}
+.post .th{width:44px;height:44px;border-radius:8px;background:var(--narLine2);margin-left:8px;flex:none}
+.rv{padding:11px 14px;display:flex;align-items:flex-start}
+.rv .c{flex:1;min-width:0;margin-left:10px}
+.rv .cm{font-size:14px;color:var(--narText)}
+.rv .me{margin-top:4px;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--narText2);white-space:nowrap;overflow:hidden}
+.rv .me .stars{color:var(--narYellow6)} .rv .me .stars i{font-style:normal;color:var(--narLine2)}
+.rv .me span:last-child{overflow:hidden;text-overflow:ellipsis}
+
+/* content */
+.nw{padding:11px 13px;display:flex;align-items:flex-start;gap:11px}
+.nw .tb{width:62px;height:47px;border-radius:7px;background:var(--narLine2);flex:none}
+.nw .ti{font-size:13.5px;line-height:1.4;color:var(--narTextTertiary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nw .me{margin-top:4px;font-size:11px;color:var(--narDark200)}
+.shorts{height:250px;gap:10px}
+.sc{flex:0 0 112px;height:250px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;overflow:hidden;cursor:pointer}
+.sc.mine{border-color:var(--narSoloLine)}
+.sc .tn{position:relative;height:199px;background:var(--narBgLast)}
+.sc .tn img{width:100%;height:100%;object-fit:cover;display:block}
+.sc .tn::after{content:"";position:absolute;inset:0;background:var(--narShortsScrim)}
+.sc .pl{position:absolute;inset:0;display:grid;place-items:center;z-index:2;font-size:22px;color:var(--narText)}
+.sc .tag{position:absolute;left:6px;top:6px;z-index:2;height:19px;padding:0 7px;border-radius:10px;font-size:10px;font-weight:600;line-height:1;display:flex;align-items:center;background:var(--narSoloTint);border:1px solid var(--narSoloLine);color:var(--narSoloText)}
+.sc .tag.team{background:var(--narWhite14);border-color:var(--narLine2);color:var(--narGray400)}
+.sc .vw{position:absolute;left:7px;bottom:6px;z-index:2;font-size:10px;font-weight:600}
+.sc .t{padding:6px 8px 0;font-size:11.5px;line-height:1.35;color:var(--narTextTertiary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shempty{margin:0 20px;min-height:120px;border:1px dashed var(--narLine2);border-radius:10px;display:grid;place-items:center;font-size:12.5px;color:var(--narText2)}
+
+/* nav */
+.nav{position:absolute;left:20px;bottom:26px;width:335px;height:72px;border-radius:38px;background:var(--narNavBg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:12px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.nav .it{width:34px;height:34px;display:grid;place-items:center;color:var(--narDark200)}
+.nav .it.on{width:auto;min-width:105px;height:48px;padding:0 12px;border-radius:26px;background:var(--narNavSelectedBg);display:flex;gap:8px;justify-content:center;color:var(--narGray400)}
+.nav .it.on span{font-size:14px;font-weight:600;line-height:24px}
+
+/* my players */
+.dh{flex:none;padding:18.5px 20px 22px;display:flex;align-items:center;gap:16px;height:74.5px}
+.dh button{display:flex;color:var(--narText)}
+.dh b{font-size:18px;font-weight:700}
+.search{margin:0 20px;padding:0 13px;height:38px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;display:flex;align-items:center;gap:8px;flex:none}
+.search input{flex:1;background:none;border:0;outline:0;color:var(--narText);font:inherit;font-size:13px;caret-color:var(--narChipActive)}
+.search input::placeholder{color:var(--narDark200)}
+.mp .chips{padding:10px 16px}
+.mplist{flex:1;overflow-y:auto;scrollbar-width:none;padding-bottom:24px}
+.mplist::-webkit-scrollbar{display:none}
+.grp{padding:16px 20px 8px;font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--narDark200)}
+.grp span{margin-left:6px;font-family:var(--os);font-weight:400;letter-spacing:0;color:var(--narDark300)}
+.tile{margin:0 20px;padding:11px 13px;background:var(--narBgTertiary);display:flex;align-items:center;gap:11px}
+.tile + .tile{border-top:1px solid var(--narLine)}
+.tile.first{border-radius:12px 12px 0 0} .tile.last{border-radius:0 0 12px 12px} .tile.first.last{border-radius:12px}
+.tile .av{position:relative;width:40px;height:40px;flex:none}
+.tile .av .im{width:40px;height:40px;border-radius:50%;background:var(--narLine2);overflow:hidden;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--narText3)}
+.tile .av .im img{width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.tile .av .badge{position:absolute;right:-3px;bottom:-3px}
+.tile .n{font-size:14px;font-weight:600;color:var(--narTextTertiary)}
+.tile .n small{font-family:var(--os);font-size:11px;font-weight:400;color:var(--narText2)}
+.tile .s{margin-top:2px;font-family:var(--os);font-size:11px;color:var(--narDark200);display:flex;align-items:center;gap:4px}
+.tile .s.live{color:var(--narSoloText)} .tile .s.w{color:var(--scoreWin)} .tile .s.l{color:var(--narText2)}
+.more{margin:9px 20px 0;height:34px;background:var(--narBgTertiary);border:1px solid var(--narLine);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:var(--narText2);cursor:pointer}
+.msg{padding:40px 20px;text-align:center;font-size:13px;color:var(--narText2)}
+.foot{margin-top:10px;font-size:11.5px;color:var(--narDark200);max-width:375px;line-height:1.55}
+.toast{position:absolute;left:50%;bottom:112px;transform:translateX(-50%);background:rgba(37,38,43,.95);border:1px solid var(--narLine2);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--narText3);z-index:20;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Warding 홈 — 앱 구현(#310) 기준 동작</h1>
+  <p class="lede">warding-mobile-repo#310 의 Flutter 코드를 치수·색 토큰·문구 그대로 옮긴 재현본이다(scale 1.0 = 375px). 결정과 미결은 <a href="spec.md">spec.md</a> 에만 있다. 왼쪽 스위치로 상태를 바꿔 보고, 폰 안의 칩·탭·스와이프·"구독 N명 전체"는 실제로 눌린다.</p>
+
+  <div class="stage">
+    <div class="panel">
+      <div class="ctl"><h3>빌드</h3>
+        <div class="seg" data-ctl="build"><button data-v="after" class="on">백엔드 연결 후</button><button data-v="release">지금 릴리즈(#310 그대로)</button></div>
+        <p id="build-note"></p></div>
+      <div class="ctl"><h3>구독 선수 솔랭</h3>
+        <div class="seg" data-ctl="solo"><button data-v="many" class="on">여러 명 솔랭 중</button><button data-v="one">1명</button><button data-v="none">솔랭 중 없음</button><button data-v="zero">구독 0명</button></div></div>
+      <div class="ctl"><h3>오늘의 경기</h3>
+        <div class="seg" data-ctl="today"><button data-v="real" class="on">오늘 실제(경기 없음)</button><button data-v="busy">경기 있는 날(9/30 아시안게임)</button></div></div>
+      <div class="legend">
+        <b>데이터</b>
+        <ul>
+          <li>순위표·쇼츠·뉴스·공지 <span class="real">prod</span> — 2026-09-25 응답 그대로</li>
+          <li>9/30 일정 <span class="real">prod</span> — 첫 경기만 LIVE 로 바꿔 보였다</li>
+          <li>솔랭·커뮤니티 글·한줄평·알림 수 <span class="fake">예시</span> — 공개 레포라 실유저 데이터 대신 지어냈다. 선수·챔피언은 실제</li>
+        </ul>
+        <b>눌리지 않는 것</b> (앱 그대로)
+        <ul><li>솔랭 카드·끝난 경기 칩, 경기 카드, 순위 행, 글·한줄평·뉴스 행, 하단 탭(다른 탭 이동은 생략)</li></ul>
+        <b>앱에 아직 없는 것</b>
+        <ul>
+          <li>솔랭 경과 시간 카운트업 — 숫자가 멈춰 있다. 백엔드 <code>startedAt</code> 으로 가능해졌다</li>
+          <li>끝난 솔랭의 KDA·"경기 결과"(5:5) — KDA 는 백엔드에 있고 5:5 는 보류</li>
+          <li>뉴스 썸네일 — 회색 자리만 그린다(모델에 URL 없음)</li>
+          <li>쇼츠 "내 선수" 매칭 — 영문 이름만 잡혀 한글 제목("페이커")은 안 걸린다. 그래서 prod 쇼츠로는 거의 비어 보인다</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="phone" id="phone">
+        <div class="notch"></div>
+        <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+
+        <div class="screen" id="home">
+          <div class="top"><span class="logo"><svg width="206" height="41" viewBox="0 0 206 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_2128_1896)">
+<path d="M16.4796 5.2395C17.2402 5.2395 17.6628 5.62288 17.9163 6.77301L22.0997 25.2603L23.4519 6.9008C23.5364 5.75067 23.959 5.2395 24.7196 5.2395H28.3537C29.1565 5.2395 29.6636 5.70807 29.5791 6.986L27.6353 35.654C27.5508 36.8468 27.086 37.3153 26.3254 37.3153H21.17C20.4094 37.3153 19.9868 36.9746 19.691 35.8244L15.1274 17.3798L11.8314 35.7818C11.6623 36.932 11.1553 37.3153 10.3946 37.3153H5.15487C4.39426 37.3153 3.88718 36.8894 3.80267 35.6966L0.168616 7.02859C-0.000409752 5.83587 0.506667 5.2395 1.3518 5.2395H5.40839C6.169 5.2395 6.59156 5.66548 6.71833 6.9008L8.7889 24.9621L12.0849 6.77301C12.2962 5.62288 12.761 5.2395 13.5216 5.2395H16.4796ZM52.6854 35.5263C52.6431 36.5912 52.0093 37.1876 50.9529 37.1876H39.6282C35.1912 37.1876 31.7262 35.6115 31.7685 31.0109C31.8107 27.2198 34.6842 25.0047 40.431 25.0047H45.375L45.5018 22.2359H37.1773C36.0786 22.2359 35.487 21.6395 35.5293 20.4894L35.5715 20.0634C35.6138 18.9559 36.2476 18.4021 37.3041 18.4021H48.0372C51.8825 18.4021 53.4885 19.5522 53.3617 22.2359L52.6854 35.5263ZM44.9525 33.3964L45.2061 28.4551H41.4452C40.5155 28.4551 39.8394 28.9663 39.7127 30.7127C39.5436 32.7574 40.093 33.3964 41.2339 33.3964H44.9525ZM57.6497 19.68C57.6919 18.6151 58.2835 18.0187 59.3399 18.0187H67.4954C68.2983 18.0187 68.8899 18.1465 69.6082 18.6151L71.8901 20.0634C72.862 20.7024 72.9465 21.5117 72.2704 22.4489L70.9182 24.2805C70.2843 25.1751 69.4392 25.3455 68.5518 24.7491L65.7629 22.8322L65.2136 35.6114C65.1713 36.6764 64.5375 37.2728 63.481 37.2728H58.537C57.4384 37.2728 56.8045 36.6764 56.8468 35.5263L57.6497 19.68ZM83.8048 37.1876C77.2551 37.1876 73.7478 34.4187 74.0858 27.7309C74.4661 20.745 78.396 18.5725 85.326 18.5725H87.6501V18.2743L88.1572 9.20106C88.1995 8.09353 88.8333 7.53976 89.8897 7.53976H94.4957C95.5943 7.53976 96.1859 8.13613 96.1437 9.28626L94.876 35.5263C94.8337 36.5912 94.1999 37.1876 93.1435 37.1876H83.8048ZM82.03 28.6681C81.9033 32.4166 83.0019 33.3964 84.6077 33.3964H87.0163L87.4811 22.3637H84.819C83.0442 22.3637 82.2413 23.2156 82.03 28.6681ZM106.57 17.1242C107.669 17.1242 108.261 17.7205 108.218 18.8707L107.585 35.5263C107.542 36.6764 106.908 37.2728 105.852 37.2728H101.246C100.147 37.2728 99.5559 36.6764 99.5981 35.5263L100.359 18.7855C100.401 17.7205 101.035 17.1242 102.091 17.1242H106.57ZM107.162 7.53976C108.261 7.53976 108.852 8.13613 108.81 9.28626L108.683 12.0977C108.641 13.1626 108.049 13.759 106.993 13.759H102.091C100.993 13.759 100.359 13.1626 100.401 12.0125L100.486 9.20106C100.528 8.13613 101.119 7.53976 102.176 7.53976H107.162ZM113.07 19.68C113.112 18.5725 113.746 18.0187 114.803 18.0187H124.268C128.071 18.0187 131.24 19.5096 131.24 23.599C131.24 26.4956 131.029 31.8203 130.818 35.6114C130.775 36.719 130.142 37.2728 129.085 37.2728H125.324C124.226 37.2728 123.676 36.6338 123.719 35.5263L124.352 22.1933H119.958L119.366 35.6114C119.324 36.6764 118.69 37.2728 117.634 37.2728H113.915C112.816 37.2728 112.225 36.6764 112.267 35.5263L113.07 19.68ZM153.363 17.8909C154.461 17.8909 155.053 18.4873 155.053 19.6374C154.926 23.3434 154.63 27.092 154.503 30.7979L154.292 35.6114C154.081 40.212 150.405 40.9787 146.052 40.9787H135.488C134.389 40.9787 133.756 40.3824 133.798 39.2322V38.6785C133.84 37.6135 134.474 37.0172 135.53 37.0172H143.475C145.587 37.0172 146.39 36.1652 146.475 34.3761L146.517 33.5242H143.136C136.587 33.5242 133.587 30.9683 133.84 25.5585C134.094 19.8504 137.305 17.8909 144.235 17.8909H153.363ZM141.784 26.0696C141.784 28.9663 142.756 29.733 144.362 29.733H146.686L146.982 21.6821H144.573C142.798 21.6821 141.784 22.3211 141.784 26.0696Z" fill="white"/>
+<path d="M204.753 0C204.753 0 195.972 8.05006 188.907 10.6493C181.842 13.2486 170.948 13.5779 170.948 13.5779C170.948 13.5779 167.06 18.4181 164.874 20.2338C162.688 22.0494 158.799 24.2273 158.799 24.2273V35.9416C158.799 35.9416 161.655 34.7486 163.553 34.8766C165.451 35.0047 167.627 38.9404 170.948 40.2013C174.269 41.4622 186.261 37.203 192.604 32.2143C198.948 27.2256 202.795 21.3821 204.753 15.4416C206.711 9.50098 204.753 0 204.753 0Z" fill="white"/>
+</g>
+<defs>
+<clipPath id="clip0_2128_1896">
+<rect width="206" height="41" fill="white"/>
+</clipPath>
+</defs>
+</svg></span>
+            <button class="bell" data-toast="알림함으로 이동"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 17V18C9 18.7956 9.31607 19.5587 9.87868 20.1213C10.4413 20.6839 11.2044 21 12 21C12.7956 21 13.5587 20.6839 14.1213 20.1213C14.6839 19.5587 15 18.7956 15 18V17M10 5C10 4.46957 10.2107 3.96086 10.5858 3.58579C10.9609 3.21071 11.4696 3 12 3C12.5304 3 13.0391 3.21071 13.4142 3.58579C13.7893 3.96086 14 4.46957 14 5C15.1484 5.54303 16.1274 6.38833 16.8321 7.4453C17.5367 8.50227 17.9404 9.73107 18 11V14C18.0753 14.6217 18.2954 15.2171 18.6428 15.7381C18.9902 16.2592 19.4551 16.6914 20 17H4C4.54494 16.6914 5.00981 16.2592 5.35719 15.7381C5.70457 15.2171 5.92474 14.6217 6 14V11C6.05956 9.73107 6.4633 8.50227 7.16795 7.4453C7.8726 6.38833 8.85159 5.54303 10 5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span><span class="cnt">3</span></button></div>
+          <div class="banner" id="banner" data-toast="공지 상세로 이동"><span>📢</span><span class="t" id="banner-t"></span><span class="x" id="banner-x">✕</span></div>
+          <div class="scroll" id="homescroll">
+            <div id="s-solo"></div>
+            <div class="gap28"></div>
+            <div id="s-today"></div>
+            <div class="gap28"></div>
+            <div id="s-stand"></div>
+            <div class="gap28"></div>
+            <div id="s-comm"></div>
+            <div class="gap28"></div>
+            <div id="s-content"></div>
+          </div>
+          <div class="nav">
+            <div class="it on"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z" fill="currentColor"/>
+</svg></span><span>홈</span></div>
+            <div class="it"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 3V7M8 3V7M4 11H20M6 5H18C19.1046 5 20 5.89543 20 7V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V7C4 5.89543 4.89543 5 6 5ZM8 15H10V17H8V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></div>
+            <div class="it"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M18 4H6C4.89543 4 4 4.89543 4 6V8C4 9.10457 4.89543 10 6 10H18C19.1046 10 20 9.10457 20 8V6C20 4.89543 19.1046 4 18 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M18 14H6C4.89543 14 4 14.8954 4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16C20 14.8954 19.1046 14 18 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></div>
+            <div class="it"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.08569 17.5087C3.17147 17.119 3.13873 16.7126 2.99169 16.3417C1.96846 14.2186 1.72795 11.8024 2.31258 9.51933C2.89722 7.23624 4.26944 5.23299 6.18713 3.86303C8.10483 2.49308 10.4448 1.84445 12.7941 2.03159C15.1434 2.21873 17.3511 3.22962 19.0278 4.88589C20.7044 6.54216 21.7422 8.73738 21.958 11.0842C22.1738 13.4311 21.5538 15.7788 20.2074 17.7131C18.861 19.6473 16.8746 21.0439 14.5988 21.6564C12.3231 22.2689 9.90408 22.0579 7.76869 21.0607C7.41822 20.9276 7.03741 20.8958 6.66969 20.9687L3.25669 21.9667C3.09205 22.0104 2.91898 22.0113 2.75389 21.9693C2.5888 21.9274 2.43716 21.844 2.31336 21.727C2.18955 21.61 2.09769 21.4633 2.04647 21.3008C1.99525 21.1384 1.98638 20.9655 2.02069 20.7987L3.08569 17.5087Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7.82769 13.0697C7.29162 12.5089 6.99361 11.7623 6.99621 10.9866C6.9988 10.2108 7.3018 9.46624 7.84161 8.90909C8.38142 8.35195 9.11606 8.02557 9.89135 7.99846C10.6666 7.97135 11.4223 8.24562 11.9997 8.76369C12.4305 8.37701 12.9639 8.12321 13.5357 8.0329C14.1075 7.94259 14.6931 8.01963 15.2221 8.25473C15.7511 8.48983 16.2008 8.87295 16.5169 9.35788C16.833 9.8428 17.0021 10.4088 17.0037 10.9877C17.0061 11.7635 16.7079 12.5101 16.1717 13.0707L12.7247 16.6907C12.6312 16.789 12.5187 16.8672 12.394 16.9206C12.2694 16.974 12.1351 17.0015 11.9995 17.0014C11.8638 17.0014 11.7296 16.9737 11.605 16.9201C11.4804 16.8665 11.368 16.7881 11.2747 16.6897L7.82769 13.0697Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></div>
+            <div class="it"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.8001 19.817L15.6281 20.955C15.5637 20.9885 15.4911 21.0035 15.4187 20.9982C15.3462 20.9929 15.2766 20.9676 15.2177 20.9251C15.1588 20.8826 15.1129 20.8245 15.085 20.7574C15.0572 20.6903 15.0486 20.6167 15.0601 20.545L15.4751 18.134L13.7181 16.427C13.6657 16.3763 13.6285 16.3119 13.611 16.2411C13.5934 16.1703 13.5961 16.096 13.6187 16.0266C13.6413 15.9573 13.683 15.8957 13.7389 15.8489C13.7949 15.8021 13.8629 15.772 13.9351 15.762L16.3631 15.41L17.4491 13.217C17.4816 13.1517 17.5317 13.0967 17.5937 13.0583C17.6557 13.0199 17.7272 12.9995 17.8001 12.9995C17.8731 12.9995 17.9446 13.0199 18.0066 13.0583C18.0686 13.0967 18.1186 13.1517 18.1511 13.217L19.2371 15.41L21.6651 15.762C21.7372 15.7723 21.8049 15.8027 21.8606 15.8495C21.9163 15.8963 21.9578 15.9578 21.9803 16.027C22.0029 16.0962 22.0057 16.1703 21.9883 16.241C21.971 16.3117 21.9342 16.3761 21.8821 16.427L20.1251 18.134L20.5391 20.544C20.5515 20.6158 20.5436 20.6898 20.5161 20.7573C20.4886 20.8249 20.4428 20.8834 20.3837 20.9262C20.3247 20.969 20.2548 20.9944 20.182 20.9995C20.1093 21.0046 20.0366 20.9891 19.9721 20.955L17.8001 19.817Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6.20014 19.817L4.02814 20.955C3.96368 20.9885 3.89117 21.0035 3.8187 20.9982C3.74623 20.9929 3.67665 20.9676 3.61773 20.9251C3.55881 20.8826 3.51288 20.8245 3.48505 20.7574C3.45722 20.6903 3.4486 20.6167 3.46014 20.545L3.87514 18.134L2.11814 16.427C2.0657 16.3763 2.02856 16.3119 2.01098 16.2411C1.9934 16.1703 1.99607 16.096 2.0187 16.0266C2.04133 15.9573 2.083 15.8957 2.13895 15.8489C2.19491 15.8021 2.26289 15.772 2.33514 15.762L4.76314 15.41L5.84914 13.217C5.88162 13.1517 5.93168 13.0967 5.99369 13.0583C6.0557 13.0199 6.12719 12.9995 6.20014 12.9995C6.27309 12.9995 6.34458 13.0199 6.40659 13.0583C6.4686 13.0967 6.51866 13.1517 6.55114 13.217L7.63714 15.41L10.0651 15.762C10.1372 15.7723 10.2049 15.8027 10.2606 15.8495C10.3163 15.8963 10.3578 15.9578 10.3804 16.027C10.4029 16.0962 10.4057 16.1703 10.3884 16.241C10.371 16.3117 10.3342 16.3761 10.2821 16.427L8.52514 18.134L8.93914 20.544C8.95157 20.6158 8.94359 20.6898 8.91612 20.7573C8.88865 20.8249 8.84278 20.8834 8.78373 20.9262C8.72468 20.969 8.65481 20.9944 8.58206 20.9995C8.5093 21.0046 8.43657 20.9891 8.37214 20.955L6.20014 19.817Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12.0001 9.81698L9.82807 10.955C9.76361 10.9885 9.6911 11.0035 9.61863 10.9982C9.54615 10.9929 9.47658 10.9676 9.41766 10.9251C9.35874 10.8826 9.3128 10.8245 9.28497 10.7574C9.25715 10.6903 9.24852 10.6167 9.26007 10.545L9.67507 8.13398L7.91807 6.42698C7.86562 6.37628 7.82849 6.31186 7.81091 6.24107C7.79333 6.17027 7.796 6.09597 7.81863 6.02662C7.84126 5.95728 7.88293 5.89569 7.93888 5.8489C7.99483 5.8021 8.06282 5.77198 8.13507 5.76198L10.5631 5.40998L11.6491 3.21698C11.6815 3.15166 11.7316 3.0967 11.7936 3.05828C11.8556 3.01987 11.9271 2.99951 12.0001 2.99951C12.073 2.99951 12.1445 3.01987 12.2065 3.05828C12.2685 3.0967 12.3186 3.15166 12.3511 3.21698L13.4371 5.40998L15.8651 5.76198C15.9371 5.77234 16.0048 5.80265 16.0605 5.84949C16.1162 5.89633 16.1577 5.95783 16.1803 6.02702C16.2029 6.09621 16.2056 6.17034 16.1883 6.24102C16.1709 6.3117 16.1341 6.37612 16.0821 6.42698L14.3251 8.13398L14.7391 10.544C14.7515 10.6158 14.7435 10.6898 14.716 10.7573C14.6886 10.8249 14.6427 10.8834 14.5837 10.9262C14.5246 10.969 14.4547 10.9944 14.382 10.9995C14.3092 11.0046 14.2365 10.9891 14.1721 10.955L12.0001 9.81698Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></div>
+            <div class="it"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 21V19C6 17.9391 6.42143 16.9217 7.17157 16.1716C7.92172 15.4214 8.93913 15 10 15H14C15.0609 15 16.0783 15.4214 16.8284 16.1716C17.5786 16.9217 18 17.9391 18 19V21M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></div>
+          </div>
+        </div>
+
+        <div class="screen mp" id="myplayers" hidden>
+          <div class="dh"><button id="back" aria-label="뒤로"><span class="ico"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M15 6L9 12L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></span></button><b>내 선수</b></div>
+          <div class="search"><span style="color:var(--narDark200)">⌕</span><input id="q" placeholder="선수 검색"></div>
+          <div class="chips" id="mp-chips"></div>
+          <div class="mplist" id="mp-list"></div>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+      <p class="foot">인기순은 최근 7일 (좋아요 + 댓글) 순이다(2026-09-25 결정). 예시로 4건을 채웠지만, 2026-09-25 prod 기준 최근 7일 글은 1건이라 실제로는 1건만 보인다.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {"players": [{"name": "Kiin", "teamCode": "GEN", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842963805_LCK_GEN_Kiin_F.PNG"}, {"name": "Canyon", "teamCode": "GEN", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842984822_LCK_GEN_Canyon_F.PNG"}, {"name": "Chovy", "teamCode": "GEN", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842975847_LCK_GEN_Chovy_F.png"}, {"name": "Ruler", "teamCode": "GEN", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842957393_LCK_GEN_Ruler_F.PNG"}, {"name": "Duro", "teamCode": "GEN", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842969792_LCK_GEN_Duro_F.PNG"}, {"name": "Doran", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087520664_LCK_T1_Doran_F.PNG"}, {"name": "Oner", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087509929_LCK_T1_Oner_F.PNG"}, {"name": "Painter", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769084021546_image6-2026-01-22T131032.591.png"}, {"name": "Faker", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087499078_LCK_T1_Faker_F.PNG"}, {"name": "Peyz", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087491906_LCK_T1_Peyz_F.PNG"}, {"name": "Keria", "teamCode": "T1", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087515444_LCK_T1_Keria_F.PNG"}, {"name": "Zeus", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089435131_LCK_HLE_Zeus_F.PNG"}, {"name": "Kanavi", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089425886_LCK_HLE_Kanavi_F.PNG"}, {"name": "Zeka", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089430303_LCK_HLE_Zeka_F.PNG"}, {"name": "Gumayusi", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089421483_LCK_HLE_Gumayusi_F.PNG"}, {"name": "Bluffing", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/upload/f_webp,q_auto,w_500,c_limit/v1785594929/players/250.webp"}, {"name": "Delight", "teamCode": "HLE", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089417110_LCK_HLE_Delight_F.PNG"}, {"name": "Siwoo", "teamCode": "DK", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842731846_LCK_DK_Siwoo_F.PNG"}, {"name": "Lucid", "teamCode": "DK", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842716183_LCK_DK_Lucid_F.PNG"}, {"name": "Showmaker", "teamCode": "DK", "img": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842721951_LCK_DK_Showmaker_F.png"}], "standings": {"scopeLabel": "정규시즌 통산", "groups": [{"name": "LEGEND", "rows": [{"rank": 1, "teamCode": "GEN", "teamName": "젠지", "wins": 19, "losses": 7, "setDiff": 22}, {"rank": 2, "teamCode": "HLE", "teamName": "한화생명e스포츠", "wins": 19, "losses": 7, "setDiff": 22}, {"rank": 3, "teamCode": "T1", "teamName": "T1", "wins": 17, "losses": 9, "setDiff": 17}, {"rank": 4, "teamCode": "DK", "teamName": "Dplus Kia", "wins": 17, "losses": 9, "setDiff": 10}, {"rank": 5, "teamCode": "KT", "teamName": "kt 롤스터", "wins": 15, "losses": 11, "setDiff": 6}]}, {"name": "RISE", "rows": [{"rank": 1, "teamCode": "BRO", "teamName": "한진 브리온", "wins": 10, "losses": 16, "setDiff": -7}, {"rank": 2, "teamCode": "NS", "teamName": "농심 레드포스", "wins": 10, "losses": 16, "setDiff": -11}, {"rank": 3, "teamCode": "BFX", "teamName": "BNK 피어엑스", "wins": 10, "losses": 16, "setDiff": -11}, {"rank": 4, "teamCode": "KRX", "teamName": "KIWOOM DRX", "wins": 7, "losses": 19, "setDiff": -19}, {"rank": 5, "teamCode": "DNS", "teamName": "DN 수퍼스", "wins": 6, "losses": 20, "setDiff": -29}]}]}, "news": [{"title": "LoL 국가대표 응원한다…라이엇 게임즈, 게임 플레이 미션·SNS 이벤트 전개", "office": "엑스포츠뉴스", "ago": "3시간 전"}, {"title": "'페이커 출격' 아시안게임, 유승민 회장 직접 볼까 \"e스포츠 대회 운영, 제대로 보고 싶다\" [나고야 현장]", "office": "스타뉴스", "ago": "9시간 전"}, {"title": "'조조편' 조셉 준 편, 엠코이와 2027년까지 동행", "office": "데일리e스포츠", "ago": "16시간 전"}, {"title": "팀 리퀴드-클라우드 나인, LCS 승자 결승...롤드컵 간다", "office": "데일리e스포츠", "ago": "16시간 전"}, {"title": "세계 최강 가리는 '발로란트 챔피언스 상하이' 24일 개막", "office": "포모스", "ago": "1일 전"}], "shorts": [{"title": "선수자격 정지 vs 게임 이용 정지 #pubg #배틀그라운드 #베트남 #shorts", "channel": "대유쾌마운틴", "views": 32282, "thumb": "https://i.ytimg.com/vi/JrMF2dIrWTo/hqdefault.jpg"}, {"title": "연휴에도 쉬지 않고 솔랭 폭주중인 도란 ㄷㄷ", "channel": "롤뻔뻔", "views": 23268, "thumb": "https://i.ytimg.com/vi/OpSwHxDVE4E/hqdefault.jpg"}, {"title": "오너가 던진 드립 그래도 받아치는 페이즈 ㅋㅋ", "channel": "롤뻔뻔", "views": 12468, "thumb": "https://i.ytimg.com/vi/_rLzEcSlWkk/hqdefault.jpg"}, {"title": "여행가자했던 기인한테 정색하는 리헨즈 ㅋㅋ", "channel": "롤뻔뻔", "views": 8451, "thumb": "https://i.ytimg.com/vi/U_3Sk92WxPU/hqdefault.jpg"}, {"title": "상금만 1억이 넘는 라이엇 문도 피구 대회 ㄷㄷ", "channel": "롤뻔뻔", "views": 11025, "thumb": "https://i.ytimg.com/vi/-BDa9aAK5mA/hqdefault.jpg"}, {"title": "덜 맞은게 확실함 #베트남 #배틀그라운드 #페이커 #shorts", "channel": "대유쾌마운틴", "views": 95962, "thumb": "https://i.ytimg.com/vi/wYoDdOr9Vbk/hqdefault.jpg"}, {"title": "안녕은 영원한 헤어짐은 맞다 #배틀그라운드 #베트남 #pubg #shorts", "channel": "대유쾌마운틴", "views": 172721, "thumb": "https://i.ytimg.com/vi/Qoe0B2SyQTQ/hqdefault.jpg"}, {"title": "지각비로 건물사기 #t1 #페이커 #페이즈 #오너 #lck #shorts", "channel": "대유쾌마운틴", "views": 127201, "thumb": "https://i.ytimg.com/vi/IEF4BEI5X_A/hqdefault.jpg"}], "notice": "[NEW] 커뮤니티 서비스 추가 🎉", "busy": [{"time": "09:00", "league": "ASIAN_GAMES", "title": "그룹 | KOR vs TPE", "status": "unstarted", "ta": "KOR", "tb": "TPE", "a": 0, "b": 0}, {"time": "09:00", "league": "ASIAN_GAMES", "title": "그룹 | IND vs HKG", "status": "unstarted", "ta": "IND", "tb": "HKG", "a": 0, "b": 0}, {"time": "11:30", "league": "ASIAN_GAMES", "title": "그룹 | HKG vs TPE", "status": "unstarted", "ta": "HKG", "tb": "TPE", "a": 0, "b": 0}, {"time": "11:30", "league": "ASIAN_GAMES", "title": "그룹 | IND vs KOR", "status": "unstarted", "ta": "IND", "tb": "KOR", "a": 0, "b": 0}, {"time": "14:00", "league": "ASIAN_GAMES", "title": "그룹 | HKG vs KOR", "status": "unstarted", "ta": "HKG", "tb": "KOR", "a": 0, "b": 0}, {"time": "14:00", "league": "ASIAN_GAMES", "title": "그룹 | IND vs TPE", "status": "unstarted", "ta": "IND", "tb": "TPE", "a": 0, "b": 0}]};
+const $ = s => document.querySelector(s);
+const st = { build:'after', solo:'many', today:'real', comm:'latest', content:'news', shortsF:'all', expanded:false, banner:true, mpTeam:'전체', mpQ:'', mpMore:false };
+
+/* ---------- 예시 데이터 (공개 레포라 지어낸 값. 선수·챔피언은 실제) ---------- */
+const P = Object.fromEntries(DATA.players.map(p => [p.name, p]));
+const ROLE = {Faker:'MID',Keria:'SUPPORT',Oner:'JUNGLE',Gumayusi:'BOTTOM',Chovy:'MID',Kiin:'TOP',Canyon:'JUNGLE',Ruler:'BOTTOM',Zeus:'TOP',Peyz:'BOTTOM',Doran:'TOP',Showmaker:'MID',Lehends:'SUPPORT',Clozer:'MID',Peanut:'JUNGLE',Duro:'SUPPORT'};
+const ROLE_KR = {TOP:'탑',JUNGLE:'정글',MID:'미드',BOTTOM:'원딜',SUPPORT:'서폿'};
+const EXTRA_TEAM = {Lehends:'NS',Clozer:'NS',Peanut:'NS',Duro:'GEN'}; // 카드 목록에 없는 선수 — 사진 없이 이니셜
+const SUBS = ['Faker','Keria','Oner','Peyz','Doran','Chovy','Kiin','Canyon','Ruler','Zeus','Gumayusi','Showmaker','Lehends','Clozer','Peanut','Duro']
+  .map(n => ({ name:n, teamCode:(P[n]&&P[n].teamCode)||EXTRA_TEAM[n], img:P[n]&&P[n].img, role:ROLE[n] }));
+const LIVE_ALL = [
+  {name:'Faker', champion:'아리', en:'Ahri', elapsed:1452},
+  {name:'Chovy', champion:'신드라', en:'Syndra', elapsed:698},
+  {name:'Zeus', champion:'그웬', en:'Gwen', elapsed:422},
+  {name:'Keria', champion:'레나타 글라스크', en:'Renata', elapsed:135},
+];
+const DONE_ALL = [
+  {name:'Oner', won:true, ago:12, dur:32}, {name:'Ruler', won:false, ago:40, dur:28},
+  {name:'Canyon', won:true, ago:63, dur:35}, {name:'Peyz', won:false, ago:95, dur:24},
+  {name:'Doran', won:true, ago:118, dur:31}, {name:'Gumayusi', won:false, ago:140, dur:27},
+];
+const POSTS = [
+  {title:'오늘 라인업 떴네요', team:'T1', h:1, likes:4, c:6, v:212},
+  {title:'국대 첫 경기 몇 시예요?', team:'GEN', h:3, likes:9, c:12, v:540},
+  {title:'경기 데이터 탭 좋네요', team:'HLE', h:9, likes:2, c:3, v:97},
+  {title:'아시안게임 예상 로스터 정리', team:null, h:30, likes:15, c:8, v:1204, thumb:true},
+];
+const REVIEWS = [
+  {player:'Chovy', champion:'신드라', team:'GEN', stars:5, comment:'라인전부터 그냥 다른 경기 하던데', nick:'예시소환사#0001', ago:12},
+  {player:'Faker', champion:'아리', team:'T1', stars:4, comment:'한타 각 보는 건 여전히 세계 최고', nick:'예시미드#0002', ago:35},
+  {player:'Zeus', champion:'그웬', team:'HLE', stars:5, comment:'탑 차이로 이긴 경기', nick:'예시탑#0003', ago:68},
+  {player:'Ruler', champion:'징크스', team:'GEN', stars:2, comment:'포지셔닝이 오늘따라 아쉬웠음', nick:'예시원딜#0004', ago:95},
+];
+
+/* ---------- 헬퍼 ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const badge = (code, s) => `<span class="badge" style="width:${s}px;height:${s}px;font-size:${(s*.4).toFixed(1)}px;padding:0 ${(s*.08).toFixed(1)}px">${esc(code||'?')}</span>`;
+const clock = t => { const h=Math.floor(t/3600), m=Math.floor(t%3600/60), s=String(t%60).padStart(2,'0'); return h ? `${h}:${String(m).padStart(2,'0')}:${s}` : `${m}:${s}`; };
+const ago = m => m < 60 ? `${m}분 전` : `${Math.floor(m/60)}시간 전`;
+const chev = '<span class="chev"></span>';
+const header = (title, sub, link, act) => `<div class="sh"><span class="t">${title}${sub?`<small>  ${sub}</small>`:''}</span>${link?`<span class="go" data-toast="${act}">${link}${chev}</span>`:''}</div>`;
+const chipBtns = (items, sel, key) => items.map(i => i.off
+  ? `<span class="chip off">${i.label}</span>`
+  : `<button class="chip${i.v===sel?' on':''}" data-set="${key}" data-v="${esc(i.v)}">${i.label}</button>`).join('');
+const chipRow = (items, sel, key) => `<div class="chips">${chipBtns(items, sel, key)}</div>`;
+const release = () => st.build === 'release';
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove('on'),1300); }
+
+/* 솔랭 스냅샷 — 빌드·상태 스위치에 따라. 릴리즈 빌드는 솔랭 소스가 비어 있다(HOME_MOCKS 꺼짐) */
+function solo(){
+  if (st.solo === 'zero') return {subs:[], live:[], done:[]};
+  if (release()) return {subs:SUBS, live:[], done:[]};
+  const live = st.solo==='many' ? LIVE_ALL : st.solo==='one' ? LIVE_ALL.slice(0,1) : [];
+  const done = st.solo==='one' ? DONE_ALL.slice(0,3) : DONE_ALL;
+  // 규칙: 구독 선수만, 라이브인 선수는 끝난 목록에서 뺀다, 라이브는 최근 시작(경과 짧은) 순, 끝난 건 최근 종료순 최대 8
+  const liveSorted = [...live].sort((a,b)=>a.elapsed-b.elapsed);
+  const liveNames = new Set(live.map(l=>l.name));
+  const doneSorted = done.filter(d=>!liveNames.has(d.name)).sort((a,b)=>a.ago-b.ago).slice(0,8);
+  return {subs:SUBS, live:liveSorted, done:doneSorted};
+}
+
+/* ---------- 섹션 1 솔랭 ---------- */
+function renderSolo(){
+  const s = solo(), el = $('#s-solo');
+  if (!s.subs.length){
+    el.innerHTML = `<div class="solo-empty"><div class="av"><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z"/></svg></div>
+      <div class="m">응원하는 선수를 구독하면\n솔랭 소식이 여기 떠요</div><button class="b" data-toast="마이 구독 탭으로 이동">선수 구독하기</button></div>`;
+    return;
+  }
+  if (!s.live.length){
+    const last = s.done[0];
+    const sub = last ? `구독 ${s.subs.length}명 · 마지막 경기 ${ago(last.ago)} · ${last.name} ${last.won?'승리':'패배'}` : `구독 ${s.subs.length}명`;
+    el.innerHTML = `<div class="quiet" data-go="myplayers"><div class="c"><div class="t1">지금 솔랭 중인 선수 없음</div><div class="t2">${esc(sub)}</div></div><span class="chev"></span></div>`;
+    return;
+  }
+  const hidden = Math.max(0, s.subs.length - s.live.length - s.done.length);
+  const cards = s.live.map(l => { const p = SUBS.find(x=>x.name===l.name);
+    return `<div class="page"><div class="hero">
+      <img class="splash" src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${l.en}_0.jpg" alt="">
+      <div class="ov"></div>${p.img?`<img class="photo" src="${esc(p.img)}" alt="">`:''}
+      <span class="champ"><i class="dot5"></i>${esc(l.champion)} 플레이 중</span>
+      <div class="body"><div class="team">${badge(p.teamCode,18)}${esc(p.teamCode)}</div><div class="nick">${esc(l.name)}</div>
+        <div class="clock"><b>${clock(l.elapsed)}</b><span>진행 중</span></div>
+        <span class="pill"><i></i>솔로 랭크</span></div></div></div>`; }).join('');
+  const dots = s.live.length > 1 ? `<div class="dots" id="dots">${s.live.slice(0,5).map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}${s.live.length>5?`<em>+${s.live.length-5}</em>`:''}</div>` : '';
+  const chips = s.done.map(d => `<div class="fin"><span class="av">${badge(SUBS.find(x=>x.name===d.name).teamCode,20)}</span>
+      <div><div class="n">${esc(d.name)}${d.dur?`<small>${d.dur}분</small>`:''}</div><div class="s${d.won?' w':''}">${ago(d.ago)} 종료 · ${d.won?'승':'패'}</div></div></div>`).join('')
+    + (hidden ? `<div class="fin rest">+${hidden}명</div>` : '');
+  el.innerHTML = `<div class="pager" id="pager">${cards}</div>${dots}
+    ${(s.done.length||hidden)?`<div class="donelabel">오늘 끝난 경기<span>  선수당 최신 1건</span></div><div class="strip done">${chips}</div>`:''}
+    <button class="seeall" data-go="myplayers">구독 ${s.subs.length}명 전체${chev}</button>`;
+  const pg = $('#pager');
+  pg && pg.addEventListener('scroll', () => { const i = Math.round(pg.scrollLeft/345);
+    document.querySelectorAll('#dots i').forEach((d,k)=>d.classList.toggle('on', k===i)); }, {passive:true});
+}
+
+/* ---------- 섹션 2 오늘의 경기 ---------- */
+function renderToday(){
+  let ms = st.today === 'busy' ? DATA.busy.map((m,i)=> i===0 ? {...m, status:'inProgress', a:1, b:0} : m) : [];
+  const isLive = s => /live|inprogress|in_progress|ongoing|진행/i.test(s||'');
+  ms = [...ms].sort((x,y)=> (isLive(y.status)?1:0) - (isLive(x.status)?1:0));
+  const card = m => { const live=isLive(m.status), done=m.status==='completed';
+    const aw = done && m.a>m.b, bw = done && m.b>m.a;
+    const row = (code,sc,w,l) => `<div class="tm${w?' win':''}${l?' lose':''}">${badge(code,18)}<span class="c">${esc(code)}</span><span class="sc">${sc}</span></div>`;
+    return `<div class="mc${live?' live':''}"><div class="h"><span class="st${live?' live':''}">${live?'LIVE':done?'종료':esc(m.time)}</span><span class="lg">${esc(m.league)} · ${esc(m.title.split(' | ')[0])}</span></div>
+      ${row(m.ta,m.a,aw,done&&!aw)}${row(m.tb,m.b,bw,done&&!bw)}</div>`; };
+  $('#s-today').innerHTML = header('오늘의 경기', null, '일정 전체', '경기일정 탭으로 이동')
+    + `<div class="strip today">${ms.map(card).join('')}<div class="mc more" data-toast="경기일정 탭으로 이동">일정 전체 →</div></div>`;
+}
+
+/* ---------- 섹션 3 순위표 ---------- */
+function renderStand(){
+  const s = DATA.standings, [main, ...rest] = s.groups;
+  const row = r => `<div class="tr"><span class="rk">${r.rank}</span>${badge(r.teamCode,26)}<span class="tn"><b>${esc(r.teamCode)}</b><small>${esc(r.teamName)}</small></span>
+    <span class="wl">${r.wins}<i>-</i>${r.losses}</span><span class="sd${r.setDiff>0?' p':''}">${r.setDiff>0?'+':''}${r.setDiff}</span></div>`;
+  const restRows = rest.reduce((n,g)=>n+g.rows.length,0);
+  const leagues = [{v:'LCK',label:'LCK'},{label:'LPL',off:1},{label:'LEC',off:1},{label:'LCS',off:1},{label:'월즈',off:1}];
+  $('#s-stand').innerHTML = header('순위표', `2026 · ${esc(s.scopeLabel||'정규시즌 통산')}`) + chipRow(leagues,'LCK','noop')
+    + `<div class="box"><div class="gh"><span>${esc(main.name||'레전드 그룹')}</span><em>승-패 · 세트 득실</em></div>${main.rows.map(row).join('')}
+      ${st.expanded ? rest.map(g=>`<div class="gh sub"><span>${esc(g.name||'라이즈 그룹')}</span></div>${g.rows.map(row).join('')}`).join('') : ''}
+      ${restRows ? `<div class="xp" data-act="expand">${st.expanded?'접기':`라이즈 그룹 ${restRows}팀 더보기`}<span style="font-size:10px">${st.expanded?'▲':'▼'}</span></div>`:''}</div>`;
+}
+
+/* ---------- 섹션 4 커뮤니티 ---------- */
+function renderComm(){
+  const hasReviews = !release() && REVIEWS.length;
+  if (!hasReviews && st.comm==='review') st.comm='latest';
+  const tabs = [{v:'latest',label:'최신순'},{v:'hot',label:'인기순'}].concat(hasReviews?[{v:'review',label:'평점 한줄평'}]:[]);
+  let body;
+  if (st.comm === 'review'){
+    body = REVIEWS.map(r=>`<div class="rv">${badge(r.team,28)}<div class="c"><div class="cm">${esc(r.comment)}</div>
+      <div class="me"><span class="stars">${'★'.repeat(r.stars)}<i>${'☆'.repeat(5-r.stars)}</i></span><span>${esc(r.player)} ${esc(r.champion)} · ${esc(r.nick)} · ${ago(r.ago)}</span></div></div></div>`).join('');
+  } else {
+    const hot = st.comm==='hot';
+    const list = hot ? [...POSTS].sort((a,b)=>(b.likes+b.c)-(a.likes+a.c)) : POSTS;
+    body = list.map((p,i)=>`<div class="post">${hot?`<span class="rk">${i+1}</span>`:''}${badge(p.team||'LoL',28)}<div class="c"><div class="ti">${esc(p.title)}</div>
+      <div class="me">${hot?`♥ ${p.likes} · 댓글 ${p.c} · 조회 ${p.v.toLocaleString()}`:`${p.h<1?'방금':p.h<24?p.h+'시간 전':Math.round(p.h/24)+'일 전'} · 댓글 ${p.c}`}</div></div>${p.thumb?'<span class="th"></span>':''}</div>`).join('');
+  }
+  $('#s-comm').innerHTML = header('커뮤니티', null, '커뮤니티 전체', '커뮤니티 탭으로 이동') + '<div style="height:10px"></div>'
+    + chipRow(tabs, st.comm, 'comm') + `<div class="box">${body}</div>`;
+}
+
+/* ---------- 섹션 5 콘텐츠 ---------- */
+function renderContent(){
+  const hasNews = !release() && DATA.news.length;
+  if (!hasNews) st.content = 'shorts';
+  const tabs = (hasNews?[{v:'news',label:'뉴스'}]:[]).concat([{v:'shorts',label:'쇼츠'}]);
+  let body;
+  if (st.content === 'news'){
+    body = `<div class="box">${DATA.news.map(n=>`<div class="nw"><span class="tb"></span><div><div class="ti">${esc(n.title)}</div><div class="me">${esc(n.office)} · ${n.ago}</div></div></div>`).join('')}</div>`;
+  } else {
+    const subs = solo().subs, names = subs.map(s=>s.name), teams = [...new Set(subs.flatMap(s=>[s.teamCode]))].filter(Boolean);
+    const word = (txt, w) => new RegExp(`(^|[^A-Za-z0-9])${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^A-Za-z0-9]|$)`, 'i').test(txt);
+    const tagged = DATA.shorts.map(v => { const hay = v.title+' '+v.channel;
+      const player = names.find(n=>word(hay,n)); const team = player?null:teams.find(t=>word(hay,t)); return {...v, player, team}; });
+    const f = st.shortsF;
+    let list = f==='player' ? tagged.filter(v=>v.player) : f==='team' ? tagged.filter(v=>v.team) : [...tagged.filter(v=>v.player),...tagged.filter(v=>!v.player&&v.team),...tagged.filter(v=>!v.player&&!v.team)];
+    const filt = chipRow([{v:'all',label:'전체'},{v:'player',label:'내 선수'},{v:'team',label:'내 팀'}], f, 'shortsF');
+    body = filt + (list.length ? `<div class="strip shorts">${list.map(v=>`<div class="sc${v.player?' mine':''}" data-toast="유튜브 앱으로 열기"><div class="tn">${v.thumb?`<img src="${esc(v.thumb)}" alt="" loading="lazy">`:''}<span class="pl">▶</span>
+        ${v.player?`<span class="tag">${esc(v.player)}</span>`:v.team?`<span class="tag team">${esc(v.team)}</span>`:''}<span class="vw">조회 ${v.views.toLocaleString()}</span></div><div class="t">${esc(v.title)}</div></div>`).join('')}</div>`
+      : `<div class="shempty">조건에 맞는 쇼츠가 아직 없어요</div>`);
+  }
+  $('#s-content').innerHTML = header('콘텐츠', st.content==='news'?'최신순':null) + '<div style="height:10px"></div>' + chipRow(tabs, st.content, 'content') + body;
+}
+
+/* ---------- 내 선수 ---------- */
+function renderMyPlayers(){
+  const s = solo(), liveBy = Object.fromEntries(s.live.map(l=>[l.name,l])), doneBy = Object.fromEntries(s.done.map(d=>[d.name,d]));
+  const teams = [...new Set(s.subs.map(p=>p.teamCode))];
+  $('#mp-chips').innerHTML = chipBtns([{v:'전체',label:'전체'}, ...teams.map(t=>({v:t,label:t}))], st.mpTeam, 'mpTeam');
+  $('#mp-chips').style.display = teams.length ? '' : 'none';
+  if (!s.subs.length){ $('#mp-list').innerHTML = '<div class="msg">구독한 선수가 없어요</div>'; return; }
+  const q = st.mpQ.trim().toLowerCase();
+  const ok = p => (st.mpTeam==='전체'||p.teamCode===st.mpTeam) && (!q || p.name.toLowerCase().includes(q));
+  const live = s.subs.filter(p=>liveBy[p.name]&&ok(p)).sort((a,b)=>liveBy[a.name].elapsed-liveBy[b.name].elapsed);
+  const played = s.subs.filter(p=>!liveBy[p.name]&&doneBy[p.name]&&ok(p)).sort((a,b)=>doneBy[a.name].ago-doneBy[b.name].ago);
+  const quiet = s.subs.filter(p=>!liveBy[p.name]&&!doneBy[p.name]&&ok(p));
+  if (!live.length && !played.length && !quiet.length){ $('#mp-list').innerHTML = '<div class="msg">찾는 선수가 없어요</div>'; return; }
+  const tile = (p,i,arr,status) => `<div class="tile${i===0?' first':''}${i===arr.length-1?' last':''}"><div class="av"><div class="im">${p.img?`<img src="${esc(p.img)}" alt="">`:esc(p.name.slice(0,2).toUpperCase())}</div>${badge(p.teamCode,18)}</div>
+    <div><div class="n">${esc(p.name)}<small>  ${esc(p.teamCode)} · ${ROLE_KR[p.role]||''}</small></div>${status}</div></div>`;
+  const group = (title, arr, fn, extra='') => arr.length ? `<div class="grp">${title}${extra}</div>` + arr.map((p,i)=>tile(p,i,arr,fn(p))).join('') : '';
+  const quietShown = st.mpMore ? quiet : quiet.slice(0,5);
+  $('#mp-list').innerHTML =
+      group('지금 솔랭 중', live, p=>{const l=liveBy[p.name]; return `<div class="s live"><i class="dot5"></i>${esc(l.champion)} · ${clock(l.elapsed)}</div>`;})
+    + group('오늘 경기함', played, p=>{const d=doneBy[p.name]; return `<div class="s ${d.won?'w':'l'}">${ago(d.ago)} · ${d.won?'승':'패'}</div>`;})
+    + group('오늘 소식 없음', quietShown, ()=>'<div class="s">오늘 경기 없음</div>', `<span>${quiet.length}명</span>`)
+    + (quiet.length>5 ? `<div class="more" data-act="mpmore">${st.mpMore?'접기':`${quiet.length-5}명 더 보기`} ${st.mpMore?'▲':'▼'}</div>` : '');
+}
+
+/* ---------- 조립 ---------- */
+function renderAll(){
+  $('#banner').style.display = st.banner ? '' : 'none';
+  renderSolo(); renderToday(); renderStand(); renderComm(); renderContent(); renderMyPlayers();
+  $('#build-note').textContent = release()
+    ? '솔랭·한줄평·뉴스 소스가 비어 있다(HOME_MOCKS 꺼짐). 솔랭은 조용한 한 줄, 평점 탭·뉴스 탭은 숨겨진다.'
+    : '솔랭 /api/mobile/me/solo-rank, 한줄평 /api/mobile/ratings/recent, 뉴스 /api/home/news 로 소스를 바꾼 뒤의 모습.';
+}
+$('#banner-t').textContent = DATA.notice;
+$('#banner-x').addEventListener('click', e => { e.stopPropagation(); st.banner=false; renderAll(); });
+document.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+  st[seg.dataset.ctl] = b.dataset.v; if (seg.dataset.ctl==='build' && b.dataset.v==='after') st.content='news';
+  renderAll();
+}));
+document.addEventListener('click', e => {
+  const set = e.target.closest('[data-set]');
+  if (set){ if (set.dataset.set!=='noop'){ st[set.dataset.set] = set.dataset.v; renderAll(); } return; }
+  const act = e.target.closest('[data-act]');
+  if (act){ if (act.dataset.act==='expand') st.expanded=!st.expanded; if (act.dataset.act==='mpmore') st.mpMore=!st.mpMore; renderAll(); return; }
+  const go = e.target.closest('[data-go]');
+  if (go){ $('#home').hidden = true; $('#myplayers').hidden = false; $('#mp-list').scrollTop = 0; return; }
+  const t = e.target.closest('[data-toast]'); if (t) toast(t.dataset.toast);
+});
+$('#back').addEventListener('click', () => { $('#myplayers').hidden = true; $('#home').hidden = false; });
+$('#q').addEventListener('input', e => { st.mpQ = e.target.value; renderMyPlayers(); });
+renderAll();
+</script>
+</body>
+</html>
