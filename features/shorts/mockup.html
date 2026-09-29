@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warding 쇼츠 — 홈 카드 · 앱 안 플레이어</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<style>
+/* 색은 ../../assets/tokens.css 변수만 쓴다. hex 직접 금지. */
+:root{
+  --ui:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --os:"Open Sans",-apple-system,"Noto Sans KR",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--gray100);color:var(--narText);font-family:var(--ui);font-size:14px;line-height:1.5}
+.wrap{max-width:1320px;margin:0 auto;padding:36px 24px 72px}
+h1{font-size:24px;font-weight:700;margin:0 0 6px}
+.lede{color:var(--narText2);margin:0 0 20px;max-width:74ch}
+.lede b{color:var(--narText);font-weight:500}
+.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 26px;color:var(--narText2);font-size:13px}
+.ctrl .seg{display:inline-flex;border:1px solid var(--narLine2);border-radius:8px;overflow:hidden}
+.ctrl .seg button{all:unset;cursor:pointer;padding:5px 12px;color:var(--narText2);font-size:13px}
+.ctrl .seg button.on{background:var(--narChipSelectedBg);color:var(--narText)}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:10px}
+.cap{font-family:var(--os);font-weight:600;font-size:13px;color:var(--narText3)}
+.cap em{font-style:normal;color:var(--narViolet3)}
+.note{width:375px;color:var(--narText2);font-size:12px;line-height:1.55}
+.note b{color:var(--narText3);font-weight:500}
+
+/* 폰 프레임 375px, 다크 전용 */
+.phone{width:375px;background:var(--narDark800);border:1px solid var(--narLine2);border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.sb{height:47px;flex:0 0 47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-family:var(--os);font-weight:600;font-size:14px}
+.sb i{font-style:normal;font-size:11px;letter-spacing:1px;color:var(--narText3)}
+.hi{flex:0 0 34px;display:grid;place-items:center}
+.hi::after{content:"";width:134px;height:5px;border-radius:3px;background:var(--narText)}
+
+/* ① 홈 */
+.ph-home{height:812px}
+.ctx{margin:6px 20px 14px;border:1px dashed var(--narLine2);border-radius:10px;height:78px;display:grid;place-items:center;color:var(--narDark200);font-size:12px;text-align:center;padding:0 12px}
+.sec-h{padding:0 20px 8px;display:flex;align-items:baseline;gap:10px}
+.sec-h b{font-size:18px;font-weight:700}
+.tabs{display:flex;padding:0 8px;border-bottom:1px solid var(--narLine)}
+.tabs.sub{border-bottom:0;padding:0 0}
+.tabs span{position:relative;padding:8px 12px;color:var(--narText2);font-weight:500;cursor:default}
+.tabs span.on{color:var(--narText)}
+.tabs span.on::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:var(--narBg)}
+.tabs.sub span{cursor:pointer;padding:8px 20px 10px;font-size:14px}
+.tabs.sub span.on::after{left:20px;right:20px;bottom:0}
+.shorts{display:flex;gap:10px;padding:8px 20px 0;overflow-x:auto;scrollbar-width:none}
+.shorts::-webkit-scrollbar{display:none}
+.sc{flex:0 0 112px;border-radius:10px;overflow:hidden;background:var(--narBgTertiary);border:1px solid var(--narLine);cursor:pointer}
+.sc.cur{border-color:var(--narChipActive)}
+.tn{aspect-ratio:9/16;background:var(--narBgLast);position:relative;overflow:hidden}
+.tn img.bg{width:100%;height:100%;object-fit:cover;display:block}
+.tn::after{content:"";position:absolute;inset:0;background:var(--narPlayedChampOverlay);pointer-events:none}
+.tn .pl{position:absolute;inset:0;display:grid;place-items:center;z-index:2}
+.tn .pl i{width:26px;height:26px;border-radius:50%;background:var(--narDarkOpacity62);display:grid;place-items:center;font-style:normal;font-size:10px;padding-left:2px}
+.tn .vw{position:absolute;left:7px;bottom:6px;z-index:2;font-family:var(--os);font-weight:600;font-size:10px;text-shadow:0 1px 3px var(--gray100)}
+.tag{position:absolute;left:6px;top:6px;z-index:2;width:24px;height:24px;border-radius:50%;background:var(--narDarkOpacity62);display:grid;place-items:center;overflow:hidden;font-family:var(--os);font-weight:600;font-size:8px}
+.tag img{width:17px;height:17px;object-fit:contain}
+.ti{padding:7px 8px 9px;font-size:11px;line-height:1.35;color:var(--narTextTertiary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:44px}
+.sc.more{display:grid;place-items:center;background:transparent;border:1px dashed var(--narLine2);color:var(--narText2);font-size:12px;flex:0 0 96px;text-align:center}
+.empty{margin:8px 20px 0;border:1px dashed var(--narLine2);border-radius:10px;min-height:150px;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:var(--narText2);font-size:14px;text-align:center;padding:0 16px}
+.btn{display:inline-block;padding:7px 14px;border-radius:8px;background:var(--narButton2Bg);border:1px solid var(--narButton2Line);color:var(--narButton2Text);font-size:13px;font-weight:500;cursor:pointer}
+.btn.light{background:var(--narButton1Bg);color:var(--narButton1Text);border-color:var(--narButton1Bg)}
+.spacer{flex:1}
+.nav{margin:0 16px 8px;height:56px;border-radius:28px;background:var(--narNavBg);display:flex;align-items:center;justify-content:space-around;font-size:11px;color:var(--narTextGnbDefault)}
+.nav b{font-weight:600;color:var(--narText);background:var(--narNavSelectedBg);border-radius:20px;padding:9px 16px}
+
+/* ② 플레이어 — 플레이어 영역 위에는 아무것도 올리지 않는다. 정보는 바깥에 둔다. */
+.ph-play{height:812px}
+.tb{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 8px}
+.ib{all:unset;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;border-radius:50%;color:var(--narText)}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb .tabs span{padding:6px 12px}
+.tb .tabs span.on::after{left:12px;right:12px;bottom:-2px}
+.tb .tabs{cursor:default}
+.stage{flex:0 0 583px;display:grid;place-items:center}
+.player{width:328px;height:583px;border-radius:12px;overflow:hidden;position:relative;background:var(--narBgLast);outline:1px dashed var(--narLine2);outline-offset:3px}
+.player img{width:100%;height:100%;object-fit:cover;display:block}
+.player .ctl{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--narWhiteBorder15)}
+.player .ctl i{display:block;height:100%;width:0;background:var(--narText);animation:prog 12s linear infinite}
+@keyframes prog{to{width:100%}}
+.player .pp{position:absolute;inset:0;display:grid;place-items:center}
+.player .pp i{width:52px;height:52px;border-radius:50%;background:var(--narDarkOpacity62);display:grid;place-items:center;font-style:normal;font-size:18px;padding-left:3px}
+.info{padding:11px 22px 0;flex:1}
+.info .who{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.info .who .lg{width:24px;height:24px;border-radius:50%;background:var(--narBgLast);display:grid;place-items:center;overflow:hidden;font-family:var(--os);font-size:8px;font-weight:600}
+.info .who .lg img{width:18px;height:18px;object-fit:contain}
+.info .who span{color:var(--narText2);font-weight:400;font-family:var(--os);font-size:12px}
+.info .tt{margin-top:5px;font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.info .mt{margin-top:6px;display:flex;justify-content:space-between;align-items:center;color:var(--narText2);font-family:var(--os);font-size:12px}
+.yt{all:unset;cursor:pointer;font-family:var(--ui);font-size:12px;color:var(--narLinkText)}
+.side{display:flex;flex-direction:column;gap:8px;align-self:center}
+.side .ib{border:1px solid var(--narLine2);color:var(--narText2)}
+
+/* ③ 상태 */
+.ph-state{height:auto}
+.mini{margin:0 20px 14px;border:1px solid var(--narLine);border-radius:14px;background:var(--narBgTertiary);overflow:hidden}
+.mini h4{margin:0;padding:8px 12px;font-family:var(--os);font-size:11px;font-weight:600;color:var(--narDark200);border-bottom:1px solid var(--narLine)}
+.mini .bd{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;min-height:150px;padding:18px 16px}
+.mini .bd p{margin:0;font-size:14px}
+.mini .bd small{color:var(--narText2);font-size:12px}
+.mini .bd .ic{font-size:26px;line-height:1}
+.dots{display:flex;gap:6px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--narDark300)}
+.dots i.on{background:var(--narText)}
+.toast{position:relative;margin:0 auto;font-size:13px;background:var(--narDarkOpacity62);border:1px solid var(--narWhiteBorder15);border-radius:18px;padding:7px 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>쇼츠 — 홈 카드 · 앱 안 플레이어</h1>
+<p class="lede">유튜브로 나가지 않고 <b>앱 안에서 세로로 넘겨 보는</b> 쇼츠. 소스는 <b>10개 팀 공식 채널 + LCK 공식 채널</b>의 쇼츠뿐이고, "내 선수"는 없다. 결정·미결·API는 <a href="spec.md" style="color:var(--narLinkText)">spec.md</a>에 있다.</p>
+
+<div class="ctrl">
+  <span>내 응원팀(예시)</span>
+  <span class="seg" id="myteam">
+    <button data-t="T1" class="on">T1</button><button data-t="KT">KT</button><button data-t="DK">DK (쇼츠 0건)</button><button data-t="">미설정</button>
+  </span>
+  <span style="margin-left:14px">카드를 누르면 ②로 열린다 · ②에서 ▲▼, ↑↓ 키, 마우스 휠로 다음/이전 영상</span>
+</div>
+
+<div class="row">
+  <!-- ① 홈 -->
+  <div class="col">
+    <div class="cap"><em>①</em> 홈 · 콘텐츠 › 쇼츠</div>
+    <div class="phone ph-home" id="home"></div>
+    <div class="note"><b>홈은 미리보기 10개.</b> 필터는 전체 / 내 팀. 카드마다 팀 로고를 붙인다(서버가 주는 팀 코드 기준). 마지막 "더보기" 카드도 ②로 열리며, 피드는 10개에서 끝나지 않고 이어서 20개씩 불러온다.</div>
+  </div>
+
+  <!-- ② 플레이어 -->
+  <div class="col">
+    <div class="cap"><em>②</em> 전체화면 세로 플레이어</div>
+    <div style="display:flex;gap:10px;align-items:flex-start">
+      <div class="phone ph-play" id="play"></div>
+      <div class="side">
+        <button class="ib" id="up" title="이전 영상"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+        <button class="ib" id="down" title="다음 영상"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+    </div>
+    <div class="note"><b>점선 = 유튜브 임베드 영역.</b> 이 위에는 아무것도 올리지 않는다(약관). 팀·제목·조회수와 "유튜브에서 보기"는 플레이어 바깥에 둔다. 영상은 썸네일로 대체했다.</div>
+  </div>
+
+  <!-- ③ 상태 -->
+  <div class="col">
+    <div class="cap"><em>③</em> 플레이어 상태</div>
+    <div class="phone ph-state" id="states"></div>
+    <div class="note">홈의 빈 상태(내 팀 0건 · 응원팀 미설정)는 위 "내 응원팀" 스위치로 ①에서 볼 수 있다.</div>
+  </div>
+</div>
+</div>
+
+<script>
+/* 데이터: 팀·LCK 공식 채널의 쇼츠, prod `/api/story/videos` 와 채널 탭 실데이터(제목·조회수). 2026-09-30 시점 스냅샷. */
+const D = {"teams":{"GEN":{"name":"젠지","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MTNfMjg4/MDAxNzg5Mjg5NTQ5NzM3.h2NwJX9dEhNPcfvJ5sxqieD1kBT_k3q4F75imIJxkZQg.8LL7TBHDy7LU48EV3UK9bSoKVg0Dc4OyI94M7cDHvPQg.PNG/NDROezqEPRecNyeDQcET.png"},"HLE":{"name":"한화생명e스포츠","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MTNfMTM1/MDAxNzg5Mjg5NjY2NDg0.P2zG3_V402wAmL5WUrDzUdFBUV8Jqges4ylWhUEf1OAg.aUdpd-iNz5t70JdkM-aERsiHVozcscgKE2FGOwVkwOAg.PNG/UDfnJkATUQlyZFnYzzel.png"},"T1":{"name":"T1","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MTJfMjky/MDAxNzg5MjIzMTkxOTIy.p5H9cFhEEuq3oZJITBqY2pQWa_DAsyq6SxsUna9jGEog.MxrLDiuzLslHu6rylxBcCQn5D_1bSWMoRtA6swtWj_Mg.PNG/wHMdrxrjYkKcEepLYJER.png"},"DK":{"name":"Dplus Kia","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTIz/MDAxNzg4NzU5NzQ2NTE2.zkcWW2paovKZVLBTmB7HRTIk4KyQUTC0dtUQGa-Wsbkg.HY006jgyuzqwhRRLhQLjJY2E0AAapu2t78wpkk-yrZUg.PNG/msuDzdOWberDdXEZuTPI.png"},"KT":{"name":"kt 롤스터","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTk3/MDAxNzg4NzU5ODY4NDEy.qhqyTMCYgoaLGM_6pEG0vY4_Tm5VbEoUVQHVhdAuTYIg.YcXvhCb7631DeRe0oVFQ_DhF-jDBHspHLjyQkIA2XEcg.PNG/MKoetWMpTpYEQDiZJxPd.png"},"BRO":{"name":"한진 브리온","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTI5/MDAxNzg4NzU5NjMwNDU4.8OeAmItxNNfa2RItgI9NbToo8YhBj5_r2DGiWgXdALwg.v-gB5NzmqrRB3BmJhzn1LGGCDoA0OcBS_kq5qWjLOVcg.PNG/HQPQbzVFibqvhzjyHNjl.png"},"NS":{"name":"농심 레드포스","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTM2/MDAxNzg4NzU5NTA5NjU2.fhu07sN3SKTJCvExSyIUPOeJ_EuXQz6WG3tvg3FC1ZUg.vhlqZnCm2Xsl_PfO-uxYJUwwdqyZ8A9yrK9EHPgY6-og.PNG/tUtirRAuotQkzyxWafpP.png"},"BFX":{"name":"BNK 피어엑스","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTQ3/MDAxNzg4NzU5NTA3NjIz.0L6KMctUlDFSyPIUsthwirRYQ6d5nKbNvn7SNWN-n3Eg.y6JNi8LJ2C91CBJd5H6HMsSyHtxiQBJwpHKxkdJ-ktcg.PNG/csHsvnsHFVHWRAJaHYPM.png"},"KRX":{"name":"KIWOOM DRX","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfNyAg/MDAxNzg4NzU3OTQ4NDYw.kqH-enTLyDwQCNtrr53EJbARXqj2g447DeXdoQaofUIg.nZ9SHFkfKpu55M6gHltGX5GH69gSHj3ZNwl0spPvResg.PNG/PLwjzVznCtCuarDgXbPe.png"},"DNS":{"name":"DN 수퍼스","logo":"https://nng-phinf.pstatic.net/MjAyNjA5MDdfMTI5/MDAxNzg4NzU5MjY2MzEy.PMyPqGSzYvPyEEn_-ExRgSMNPcwyslMbtnbpa06k550g.TWrCM6N5pI-10hLMLqP3aCTooh3HsxyZAUpf_1GFUrIg.PNG/NTbAJlZwCIgxyzZlTNrE.png"}},"shorts":[{"id":"_GegBX4ETwg","team":"BRO","title":"2026 한진 브리온 멤버십 팬미팅 티켓 오픈 D-1💚","views":1979,"at":"2026-09-29T14:30"},{"id":"9xAlNOmn4Lk","team":"GEN","title":"기인이 귀여워","views":61440,"at":"2026-09-26T19:10"},{"id":"0Im2KJbHQaI","team":"GEN","title":"쵸비의 레이저 제모 1인칭 시점","views":95486,"at":"2026-09-26T19:05"},{"id":"pDFEbNJSE1U","team":"NS","title":"코끼리보다 네가 더 귀여워","views":8645,"at":"2026-09-26T12:20"},{"id":"rtZf8Ju3Nts","team":"NS","title":"자기야 나는 눈 감을게","views":7874,"at":"2026-09-26T12:10"},{"id":"OhUxEvbuazU","team":"NS","title":"자기야 눈 감지마","views":12416,"at":"2026-09-26T12:00"},{"id":"p4rpdqM5o2M","team":"BRO","title":"한진 브리온의 승리 공식 6쏭 매직!","views":4034,"at":"2026-09-25T20:00"},{"id":"cwIECQdTvJw","team":"HLE","title":"우리진혁의 What's in my bag | Razer Huntsman V3 PRO TKL 8KHz","views":43165,"at":"2026-09-25T15:00"},{"id":"njW56I6j2NQ","team":"HLE","title":"오렌지 여러분 즐거운 추석 보내세요 🍊","views":53208,"at":"2026-09-25T12:00"},{"id":"EN4pLCPsgkM","team":"BRO","title":"프로게이머가 그린 같은 팀 선수 그림 판매합니다.","views":10907,"at":"2026-09-24T20:00"},{"id":"r-WQr5o_E1s","team":"NS","title":"킹겐 선생의 프로게이머 근본론","views":22678,"at":"2026-09-24T19:14"},{"id":"15dz8BH-3jc","team":"NS","title":"07년생은 모르는 파워오투 마시는 법","views":56127,"at":"2026-09-24T19:14"},{"id":"NQAarWx0vx0","team":"NS","title":"늙크크(?) 디아블의 야호...","views":13610,"at":"2026-09-24T19:12"},{"id":"FKHoVNB_qlg","team":"NS","title":"누누이 말하지만 프로게이머입니다","views":68953,"at":"2026-09-24T19:12"},{"id":"RWD4EEg1D00","team":"KT","title":"추석에 제일 [ ] 할 것 같은 사람에게 넘길게요 🌕","views":15423,"at":"2026-09-24T18:00"},{"id":"YCg9nbO1zCI","team":"KT","title":"Q. 100만원 주면 명절 잔소리 언제까지 듣기 가능? A. 살아있을 때까지.","views":6400,"at":"2026-09-24T15:00"},{"id":"uS9QXJ10XO8","team":"LCK","title":"T1 팬은 얼마나 잘 통할까? | 일심동체 게임","views":34267,"at":"2026-09-24T15:00"},{"id":"wlemW2usiGI","team":"BRO","title":"최약체 평가를 뒤집은 2026 BRO ROSTER","views":2234,"at":"2026-09-23T20:00"},{"id":"6yJ7WRQV8W0","team":"KRX","title":"???: 왜 늦게와서 팀을 지게 만든거임?","views":3771,"at":"2026-09-23T20:00"},{"id":"ZsWMtWy7i6w","team":"LCK","title":"HLE 팬은 얼마나 잘 통할까? | 일심동체 게임","views":25070,"at":"2026-09-23T15:00"},{"id":"F3vQAg_eF2A","team":"T1","title":"일본인이 레몬 먹고 하는 말은? (ft. 오너)","views":74759,"at":"2026-09-23T13:00"},{"id":"xbgKf9fcccU","team":"BRO","title":"눈물 나게 아쉬웠던 신인선수의 첫 시즌 마무리","views":9944,"at":"2026-09-22T22:00"},{"id":"o65c4DhXh-Q","team":"LCK","title":"GEN 팬은 얼마나 잘 통할까? | 일심동체 게임","views":36205,"at":"2026-09-22T15:00"},{"id":"vQ7L39TP2co","team":"GEN","title":"젠지 LCK 2연속 우승 :  더 단단해진 젠지","views":24162,"at":"2026-09-21T19:30"},{"id":"Gc3nBeqKlB4","team":"GEN","title":"독기구리는 계속된다","views":43811,"at":"2026-09-21T19:00"},{"id":"_nFzLlmkHxY","team":"KT","title":"누가 사미라게?","views":4692,"at":"2026-09-21T18:30"},{"id":"QyRmj9-v8GU","team":"KT","title":"디지몬 생활 게임 언제 나오나","views":4836,"at":"2026-09-21T18:30"},{"id":"iKtbbqOKUNE","team":"LCK","title":"2026 LCK 결승전, 승리의 순간","views":28305,"at":"2026-09-21T18:00"},{"id":"7_ylcsopJHo","team":"BFX","title":"📞 족보닷컴에서 걸려온 BNK FEARX 선수단의 응원 메시지","views":889,"at":"2026-09-21T17:00"},{"id":"zuLZpq7jV0E","team":"GEN","title":"Gen.G’s EWC 2026 Journey | ONE CLUB. MANY STORIES.","views":2661,"at":"2026-09-20T15:56"},{"id":"HdSLoJy9daA","team":"T1","title":"그저 환🟠타 좋아 청년","views":64698,"at":"2026-09-19T18:00"},{"id":"WQk_vFsK5MY","team":"LCK","title":"우리 WON, THE PLAY - DK Career","views":18894,"at":"2026-09-18T18:01"},{"id":"Y_kC8MrWIFk","team":"T1","title":"'요리 고수'의 김볶밥 취향","views":84647,"at":"2026-09-18T18:00"},{"id":"2n2PIBF6iUU","team":"LCK","title":"우리 WON, THE PLAY - BRO Roamer","views":16713,"at":"2026-09-18T18:00"},{"id":"W0uj3pT2fLs","team":"HLE","title":"아공건의 What's in my bag | Razer Viper V4 Pro with HLE","views":33018,"at":"2026-09-18T17:06"},{"id":"wBStar5aWko","team":"HLE","title":"아공건의 What's in my bag | Razer Viper V4 Pro with HLE","views":5545,"at":"2026-09-18T14:34"},{"id":"HDB1QYmNqsQ","team":"LCK","title":"LCK 결승 진출전 & 결승전 OOTD CHECK!","views":13131,"at":"2026-09-18T11:00"},{"id":"x1Rh3AulYVU","team":"KT","title":"제이스 도미닉 이거 진짜 셉니다","views":19253,"at":"2026-09-17T12:30"},{"id":"yKIB2LWoEXs","team":"T1","title":"한창 벌이 궁금할 나이 (ft. 페이즈)","views":129779,"at":"2026-09-16T13:00"},{"id":"lq4S_7PgEF8","team":"GEN","title":"영어만 쓰고 증바람을 할 수 있을까","views":35295,"at":"2026-09-15T19:15"},{"id":"tcwXrnKsP_w","team":"GEN","title":"수상할 정도로 게임을 잘하는 고등학생","views":56440,"at":"2026-09-15T19:10"},{"id":"mLtm8PRAVcg","team":"GEN","title":"폭풍의 전학생","views":35527,"at":"2026-09-15T19:05"},{"id":"apnDaKLVCAk","team":"LCK","title":"여러분 젠지가 우승했습니다!!","views":78827,"at":"2026-09-15T11:30"},{"id":"EZRo8nBIii8","team":"LCK","title":"2026 LCK 결승전의 신, Ruler ✨","views":80958,"at":"2026-09-15T11:30"},{"id":"tg_9QJM7PnA","team":"LCK","title":"제리타임!","views":227656,"at":"2026-09-14T13:30"},{"id":"c2OiimOOki0","team":"NS","title":"프로게이머 하길 잘했다","views":45136,"at":"2026-09-11T19:00"},{"id":"aGOKUCv6P88","team":"NS","title":"꼬치메이커","views":6899,"at":"2026-09-11T19:00"},{"id":"RwvagsTTGhg","team":"KT","title":"[킅크크 Ep.06] 영크크 테스트 2탄(커즈&에포트)","views":2676,"at":"2026-09-11T18:00"},{"id":"JKJZbNG3KU0","team":"GEN","title":"쵸비와 룰러가 패배를 마주하는 방식","views":556047,"at":"2026-09-10T19:10"},{"id":"HxzS12l6508","team":"GEN","title":"젠지 프랜차이즈 스타가 줘야지","views":82763,"at":"2026-09-10T19:05"},{"id":"B4hTj24Q5l4","team":"HLE","title":"나는 감정없는 싸이코라그런가 카정에는 미동도안함","views":83631,"at":"2026-09-10T18:40"},{"id":"558h5B2voQI","team":"HLE","title":"주장이 우승해준다고 했다","views":76380,"at":"2026-09-10T18:39"},{"id":"_sFUgtBKmoY","team":"T1","title":"애는 착해(ft. 오너&페이즈)","views":98269,"at":"2026-09-09T13:00"},{"id":"-EnoIn_kLKs","team":"KT","title":"스킨 쌀먹(?)의 이유","views":6047,"at":"2026-09-09T12:30"},{"id":"9WBm3gbDSQY","team":"KT","title":"커즈의 불경한 히드라 극딜 오공","views":6451,"at":"2026-09-09T12:30"},{"id":"YElGlLNu8Hw","team":"GEN","title":"기인식 애정표현","views":117332,"at":"2026-09-04T22:10"},{"id":"wHnfIFyO-uc","team":"GEN","title":"칠전팔기 룰러","views":294214,"at":"2026-09-04T22:05"},{"id":"kK2pnJzVB78","team":"KT","title":"[킅크크 Ep.05] 영크크 테스트 1탄(커즈&에포트)","views":5718,"at":"2026-09-03T18:00"},{"id":"-WyQyO-2ZNs","team":"NS","title":"새우깡 보드게임 2배로 즐기는 법","views":8083,"at":"2026-09-02T20:00"},{"id":"RGbVUhO6av0","team":"T1","title":"다 알고있는 비밀 (ft. 도란&케리아)","views":1156078,"at":"2026-09-02T13:00"},{"id":"Rc2amYjsk1U","team":"HLE","title":"피즈 갱을 조심해","views":35229,"at":"2026-09-01T17:00"},{"id":"soCLxiM9gxM","team":"HLE","title":"단 하루도 그에게 소중하지 않은 날이 없었다","views":58593,"at":"2026-09-01T17:00"},{"id":"oSgrHubMQ2w","team":"GEN","title":"늙크크","views":108118,"at":"2026-08-31T19:10"},{"id":"Cq0P-f_f2gM","team":"GEN","title":"REDRED 춤추는 쵸비","views":132248,"at":"2026-08-31T19:05"},{"id":"q3b62-ITwUU","team":"KRX","title":"아니 신선도가 생명인디.. 진짜 뜯어유?","views":2310,"at":"2026-08-31T15:00"},{"id":"ChNrsZb4Brc","team":"KT","title":"BAD 챌린지를 완수해 주세요! l kt Rolster 킅!퇴근하겠습니다","views":12577,"at":"2026-08-31T12:00"},{"id":"y325VKUhisc","team":"KT","title":"Jiwoo 승리 인터뷰 l kt Rolster 2026 LCK 플레이오프","views":10078,"at":"2026-08-30T22:23"},{"id":"kP_acN5Kaww","team":"KT","title":"역배의 악마 | LCK 플레이오프 KT vs DK 3세트 하이라이트","views":25176,"at":"2026-08-30T21:00"},{"id":"ufvgtTZyuic","team":"KT","title":"꿈같은 15,000골드 역전 | LCK 플레이오프 KT vs DK 2세트 하이라이트","views":42849,"at":"2026-08-30T20:48"},{"id":"uHNdIw0mPqE","team":"KT","title":"오늘을 위해 깎아온 탑 트런들 | LCK 플레이오프 KT vs DK 1세트 하이라이트","views":35158,"at":"2026-08-30T20:01"},{"id":"ktFu2a9Ap7E","team":"T1","title":"돌아 오셨군요네 [T1scord 2026 vs BFX]","views":291794,"at":"2026-08-30T15:33"},{"id":"aWIZTkQ6JtU","team":"HLE","title":"치직 치지직","views":156506,"at":"2026-08-29T12:01"},{"id":"L6mkAahqm6A","team":"HLE","title":"드롭킥 리 신","views":135175,"at":"2026-08-29T12:01"},{"id":"SUf0GJrx6U4","team":"BRO","title":"프로게이머가 노트 필기를 하는 이유","views":7039,"at":"2026-08-28T15:30"},{"id":"f3BW40YymWU","team":"BFX","title":"플레이인을 앞둔, 선수단의 각오","views":3084,"at":"2026-08-27T16:00"},{"id":"AXsLuq5P7cw","team":"KT","title":"게시물로 팬분들에게 감사함을 전달하세요! l kt Rolster 킅!퇴근하겠습니다","views":5691,"at":"2026-08-27T10:24"},{"id":"VUaflTPoK6Q","team":"KT","title":"Effort 승리 인터뷰 l kt Rolster 2026 LCK 플레이인","views":4912,"at":"2026-08-27T00:58"},{"id":"1WZeYNm1O1s","team":"KT","title":"결국 올라갑니다 | LCK 플레이인 KT vs BRO 5세트 하이라이트","views":22447,"at":"2026-08-26T23:00"},{"id":"0TMjvGqbcFk","team":"KT","title":"바론 둥지 역전 한타 | LCK 플레이인 KT vs BRO 4세트 하이라이트","views":20639,"at":"2026-08-26T22:30"},{"id":"ixlFg6kf9Ik","team":"KT","title":"지우의 시간차 펜타킬 | LCK 플레이인 KT vs BRO 1세트 하이라이트","views":14912,"at":"2026-08-26T21:56"},{"id":"cyVdNmaAHFc","team":"T1","title":"페칼리의 바텀 생존기(ft. 페이즈)","views":455405,"at":"2026-08-26T12:00"},{"id":"IdhMcg0OZXo","team":"HLE","title":"Siwoo 선수 지금 보고있는거 압니다","views":146767,"at":"2026-08-25T17:00"},{"id":"iDBpBEG-s8c","team":"HLE","title":"그 신의 이름은 아프락사스이다","views":41291,"at":"2026-08-25T17:00"},{"id":"1JHoVc2JNkc","team":"BRO","title":"동부대공 로머의 세리머니 모음ZIP","views":6161,"at":"2026-08-24T20:00"},{"id":"RnRqI6enEvw","team":"KT","title":"[킅크크 Ep.04] 슬랑이 만들기 2탄(퍼펙트)","views":3845,"at":"2026-08-24T19:30"},{"id":"-swSGiwwHZU","team":"KT","title":"롤파크에 간다면 놓칠 수 없는 곳","views":5151,"at":"2026-08-24T18:00"},{"id":"zehsRbI3iso","team":"DNS","title":"🌟DN SOOPers POM INTERVIEW🌟","views":1269,"at":"2026-08-23T15:00"},{"id":"WtjF2bJch3Q","team":"GEN","title":"쵸비의 웃음 참기 챌린지","views":47092,"at":"2026-08-22T12:00"},{"id":"GUyutCReq08","team":"T1","title":"몰래 온 손님 [T1scord vs KT]","views":738498,"at":"2026-08-22T01:25"},{"id":"BN5exO31a0w","team":"KT","title":"눈 마주쳤어? 그럼 죽어 | LCK KT vs T1 1세트 하이라이트","views":19394,"at":"2026-08-21T21:21"},{"id":"iVjDffWuedk","team":"BRO","title":"니코 궁 한방에 한타 끝!","views":2178,"at":"2026-08-21T15:00"},{"id":"ZBp4Lc6PA3s","team":"GEN","title":"숨 막히는 연기 대결","views":11608,"at":"2026-08-21T12:00"},{"id":"V74kN4orJfE","team":"T1","title":"호신용 쌍절곤 (ft. 케리아)","views":172060,"at":"2026-08-20T12:00"},{"id":"jL-ancrp53w","team":"GEN","title":"대건부 끝내기 인섹킥","views":39836,"at":"2026-08-19T21:10"},{"id":"g5x1g-z7oqc","team":"GEN","title":"끝까지 가면 우리가 이겨","views":125171,"at":"2026-08-19T21:08"},{"id":"xov4g_3cysk","team":"KT","title":"답답했던 흐름을 뚫어주는 솔로 킬 + 받아치기 | LCK KT vs GEN 2세트 하이라이트","views":11957,"at":"2026-08-19T18:48"},{"id":"lQvTkz3V_OI","team":"BRO","title":"베테랑 원딜 테디의 무결점 카이사 플레이!","views":13130,"at":"2026-08-19T16:30"},{"id":"YOL6Ncd5z4U","team":"T1","title":"웱?옴 cvMax [T1scord 2026 vs DK]","views":766853,"at":"2026-08-19T15:44"},{"id":"aphfk9ffw04","team":"BRO","title":"10년차 테디도 느끼는 LCK 무대의 긴장감","views":3511,"at":"2026-08-19T15:30"},{"id":"cOEM1C2g-jU","team":"T1","title":"교수님 진도가 너무 빨라요 (ft. 페이커)","views":183148,"at":"2026-08-19T12:00"},{"id":"XJW_AKZHJKc","team":"BRO","title":"기드온의 프로 마인드를 바꿔 놓은 킹겐&리헨즈","views":3692,"at":"2026-08-17T22:00"},{"id":"bICNHCzY9Tw","team":"KT","title":"[킅크크 Ep.03] 슬랑이 만들기 1탄(퍼펙트)","views":4773,"at":"2026-08-17T18:07"},{"id":"bBjtW8Zyu3s","team":"KRX","title":"유칼의 ROG Falchion Ace 75 HE V2X RED 언박싱!","views":1514,"at":"2026-08-17T16:31"},{"id":"erJQFnkhjtI","team":"T1","title":"설마 이거 아직 모르는 사람 없지?","views":59960,"at":"2026-08-17T12:00"},{"id":"Oa60wbvL02U","team":"DNS","title":"🌟DN SOOPers POM INTERVIEW🌟","views":2719,"at":"2026-08-16T15:00"},{"id":"nBy0FMyoQSI","team":"KT","title":"어~ 형이야~ | LCK KT vs HLE 1세트 하이라이트","views":13337,"at":"2026-08-15T18:03"}]};
+const TEAMS = D.teams, ALL = D.shorts;
+let filter = 'all', myTeam = 'T1', cur = 0;
+
+const fmtViews = n => n>=10000 ? `조회 ${(n/10000).toFixed(1)}만` : n>=1000 ? `조회 ${(n/1000).toFixed(1)}천` : `조회 ${n}`;
+const fmtDate = s => `${+s.slice(5,7)}월 ${+s.slice(8,10)}일`;
+/* 세로 썸네일(oardefault, 1080x1920)을 먼저 쓰고, 없으면 hqdefault 로 폴백한다.
+   없는 영상은 404 + 120x90 회색 이미지가 오는데 <img> 는 그걸 그대로 그리므로 크기로 판별한다.
+   앱(Flutter)은 non-200 이면 errorWidget 이 타서 폴백이 자연스럽다. */
+const thumb = id => `<img class="bg" alt="" loading="lazy" src="https://i.ytimg.com/vi/${id}/oardefault.jpg" onload="if(this.naturalWidth<300&&!this.dataset.f){this.dataset.f=1;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'}" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'}">`;
+const logoOf = (t,cls='') => t==='LCK' ? `<span>LCK</span>` : `<img src="${TEAMS[t].logo}" alt="${TEAMS[t].name}">`;
+const nameOf = t => t==='LCK' ? 'LCK' : TEAMS[t].name;
+
+const feed = () => filter==='team' ? ALL.filter(v=>v.team===myTeam) : ALL;
+const status = (t,c) => `<div class="sb"><span>${t}</span><i>●●● ${c}</i></div>`;
+
+function renderHome(){
+  const list = feed(), top = list.slice(0,10);
+  const tabs = ['all','team'].map(k=>`<span data-f="${k}" class="${filter===k?'on':''}">${k==='all'?'전체':'내 팀'}</span>`).join('');
+  let body;
+  if (filter==='team' && !myTeam){
+    body = `<div class="empty"><span>내 팀을 아직 정하지 않았어요</span><span class="btn light">응원팀 설정하기</span></div>`;
+  } else if (!top.length){
+    body = `<div class="empty"><span>조건에 맞는 쇼츠가 아직 없어요</span><small style="color:var(--narDark200);font-size:12px">${nameOf(myTeam)}이(가) 최근 올린 쇼츠가 없어요</small><span class="btn" data-f="all">전체 보기</span></div>`;
+  } else {
+    body = `<div class="shorts">${top.map((v,i)=>`<div class="sc ${i===cur?'cur':''}" data-i="${i}">
+        <div class="tn">${thumb(v.id)}<span class="tag">${logoOf(v.team)}</span>
+          <div class="pl"><i>▶</i></div><span class="vw">${fmtViews(v.views)}</span></div>
+        <div class="ti">${v.title}</div></div>`).join('')}
+      <div class="sc more" data-i="${top.length}">더보기<br>→</div></div>`;
+  }
+  document.getElementById('home').innerHTML = `${status('9:41','5G')}
+    <div class="ctx">구독 선수 · 오늘 경기 · 순위표 · 커뮤니티<br>(홈 위쪽 섹션)</div>
+    <div class="sec-h"><b>콘텐츠</b></div>
+    <div class="tabs"><span>뉴스</span><span class="on">쇼츠</span></div>
+    <div class="tabs sub" style="margin-top:4px">${tabs}</div>
+    ${body}
+    <div class="spacer"></div>
+    <div class="nav"><span>일정</span><b>홈</b><span>커뮤니티</span><span>MY</span></div><div class="hi"></div>`;
+}
+
+const svg = {
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  mute:'<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path d="M19 7a8 8 0 0 1 0 10"/></svg>'
+};
+function renderPlay(){
+  const list = feed(), v = list[cur];
+  const stage = v ? `<div class="stage"><div class="player">${thumb(v.id)}
+      <div class="pp"><i>▶</i></div><div class="ctl"><i></i></div></div></div>
+    <div class="info">
+      <div class="who"><span class="lg">${logoOf(v.team)}</span>${nameOf(v.team)}<span>· ${fmtDate(v.at)}</span></div>
+      <div class="tt">${v.title}</div>
+      <div class="mt"><span>${fmtViews(v.views)}</span><button class="yt">유튜브에서 보기 ↗</button></div></div>`
+    : `<div class="stage" style="flex:1"><div class="empty" style="margin:0 20px;min-height:0;padding:40px 16px">
+        <span>${filter==='team' && !myTeam ? '내 팀을 아직 정하지 않았어요' : '조건에 맞는 쇼츠가 아직 없어요'}</span>
+        <span class="btn" data-f="all">전체 보기</span></div></div>`;
+  document.getElementById('play').innerHTML = `${status('9:41','5G')}
+    <div class="tb"><button class="ib" title="닫기">${svg.x}</button>
+      <div class="tabs sub" style="padding:0">${['all','team'].map(k=>`<span data-f="${k}" class="${filter===k?'on':''}" style="padding:6px 14px">${k==='all'?'전체':'내 팀'}</span>`).join('')}</div>
+      <button class="ib" title="음소거">${svg.mute}</button></div>
+    ${stage}
+    <div class="hi"></div>`;
+}
+
+function renderStates(){
+  document.getElementById('states').innerHTML = `${status('9:41','5G')}
+    <div style="height:8px"></div>
+    <div class="mini"><h4>재생 불가 — 임베드가 막혔거나 삭제된 영상</h4><div class="bd">
+      <div class="toast">재생할 수 없는 영상이에요 · 다음으로 넘길게요</div>
+      <small>1건이면 자동으로 다음 영상으로 넘어간다. 연속 3건 이상 실패하면 아래 화면으로 바뀐다.</small>
+      <span class="ic">⚠</span><p>재생할 수 없어요</p><span class="btn">유튜브에서 열기 ↗</span></div></div>
+    <div class="mini"><h4>다음 영상 불러오기 실패 — 현재 영상은 유지</h4><div class="bd">
+      <p>영상을 더 불러오지 못했어요</p><span class="btn">다시 시도</span>
+      <small>스와이프를 막지 않는다. 아래로 넘기려 할 때 한 번 더 안내한다.</small></div></div>
+    <div class="mini"><h4>피드 끝 — 내 팀 필터에서 실제로 닿을 수 있다</h4><div class="bd">
+      <span class="ic">🎬</span><p>다 봤어요</p><small>새 쇼츠가 올라오면 알려드릴게요</small>
+      <span style="display:flex;gap:8px"><span class="btn">전체 보기</span><span class="btn light">커뮤니티 구경하기</span></span></div></div>
+    <div class="hi"></div>`;
+}
+
+/* 이벤트 */
+addEventListener('click', e=>{
+  const f = e.target.closest('[data-f]'); if (f){ filter=f.dataset.f; cur=0; renderAll(); return; }
+  const c = e.target.closest('[data-i]'); if (c){ cur=+c.dataset.i; renderAll(); }
+});
+document.getElementById('myteam').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  myTeam=b.dataset.t; [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+  cur=0; renderAll();
+});
+const go = d => { const n=feed().length; if(!n) return; cur=Math.max(0,Math.min(n-1,cur+d)); renderAll(); };
+document.getElementById('up').onclick=()=>go(-1);
+document.getElementById('down').onclick=()=>go(1);
+addEventListener('keydown', e=>{ if(e.key==='ArrowDown') go(1); if(e.key==='ArrowUp') go(-1); });
+document.getElementById('play').addEventListener('wheel', e=>{ e.preventDefault(); go(e.deltaY>0?1:-1); }, {passive:false});
+
+function renderAll(){ renderHome(); renderPlay(); }
+renderAll(); renderStates();
+</script>
+</body>
+</html>
