@@ -45,9 +45,9 @@
 | 데이터 | 엔드포인트 | 있음 / 새로 / 확인 필요 |
 |---|---|---|
 | 쇼츠 목록 | `GET /api/story/videos?category=shorts&sort=latest&page=&size=` | 있음. `category`는 all\|pro\|shorts, `sort`는 latest\|views\|likes, `period`는 all\|week\|month. **`category=shorts`가 지금은 유튜버 채널 쇼츠를 준다.** 팀·LCK 공식 쇼츠만 주도록 [nar-back-repo#544](https://github.com/NAR-GG/nar-back-repo/pull/544)가 바꾼다(머지 전) |
-| 응답의 팀 코드 | 위 응답의 `teamCode` | 새로. 지금 응답에는 팀 필드가 없어서 앱이 `title + channelName`을 문자열로 대조한다 |
-| 내 팀 필터 | 위 엔드포인트의 `teamCode` 쿼리 | 새로 |
-| `size` 상한 | 위 엔드포인트 | 새로. 지금은 상한이 없다(200도 통과한다). 기본 20, 상한 50을 제안한다 |
+| 응답의 팀 코드 | 위 응답의 `teamCode` | 새로([nar-back-repo#545](https://github.com/NAR-GG/nar-back-repo/pull/545), 머지 전). 지금 응답에는 팀 필드가 없어서 앱이 `title + channelName`을 문자열로 대조한다 |
+| 내 팀 필터 | 위 엔드포인트의 `teamCode` 쿼리 | 새로(#545). 없거나 공백이면 거르지 않는다 |
+| `size` 상한 | 위 엔드포인트 | 새로(#545). 지금은 상한이 없다(200도 통과한다). 기본 20, 상한 100으로 맞춘다. 기존 소비자를 깨지 않으려고 넉넉히 뒀다 |
 | 내 응원팀 | 앱의 마이페이지 응원팀 값 | 확인 필요. 커뮤니티 작성자의 `teamCode`와 같은 코드 체계인지 |
 | 재생 | 유튜브 IFrame 임베드 | 새로(앱). 서버 API가 아니다. 유튜브 Data API 쿼터를 쓰지 않는다 |
 
