@@ -142,7 +142,7 @@ h1{font-size:24px;font-weight:700;margin:0 0 6px}
         <button class="ib" id="down" title="다음 영상"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
       </div>
     </div>
-    <div class="note"><b>점선 = 유튜브 임베드 영역.</b> 이 위에는 아무것도 올리지 않는다(약관). 팀·제목·조회수와 "유튜브에서 보기"는 플레이어 바깥에 둔다. 영상은 썸네일로 대체했다.</div>
+    <div class="note"><b>점선 = 유튜브 임베드 영역.</b> 이 위에는 아무것도 올리지 않는다(약관). 팀·제목·조회수와 "유튜브에서 보기"는 플레이어 바깥에 둔다. <b>소리는 항상 꺼진 채로 재생한다</b>(오른쪽 위 아이콘은 상태 표시). 영상은 썸네일로 대체했다.</div>
   </div>
 
   <!-- ③ 상태 -->
@@ -199,7 +199,7 @@ function renderHome(){
 
 const svg = {
   x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-  mute:'<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9.5a4 4 0 0 1 0 5"/><path d="M19 7a8 8 0 0 1 0 10"/></svg>'
+  mute:'<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/></svg>'
 };
 function renderPlay(){
   const list = feed(), v = list[cur];
@@ -215,7 +215,7 @@ function renderPlay(){
   document.getElementById('play').innerHTML = `${status('9:41','5G')}
     <div class="tb"><button class="ib" title="닫기">${svg.x}</button>
       <div class="tabs sub" style="padding:0">${['all','team'].map(k=>`<span data-f="${k}" class="${filter===k?'on':''}" style="padding:6px 14px">${k==='all'?'전체':'내 팀'}</span>`).join('')}</div>
-      <button class="ib" title="음소거">${svg.mute}</button></div>
+      <button class="ib" title="소리는 항상 꺼져 있다" style="color:var(--narText2)">${svg.mute}</button></div>
     ${stage}
     <div class="hi"></div>`;
 }
