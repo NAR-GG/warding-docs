@@ -65,3 +65,4 @@ python3 scripts/sync-tokens.py
 |---|---|
 | [홈 화면 개편](features/home/spec.md) · [목업](features/home/mockup.html) | 초안 |
 | [쇼츠 (앱 안 재생)](features/shorts/spec.md) · [목업](features/shorts/mockup.html) | 초안 |
+| [광고판 (자체 광고 슬롯)](features/ad-slots/spec.md) · [목업](features/ad-slots/mockup.html) | 초안 |
