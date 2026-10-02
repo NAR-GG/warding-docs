@@ -90,6 +90,10 @@
 비었다. 리그 **목록 자체**는 2026-10-02부터 `/mobile/schedules/filters` 응답을 쓰도록
 고쳤고, 여기에 **메타 필드 3개를 더** 요청한다.
 
+지금도 같은 일이 벌어져 있다 — 백엔드가 `ASIAN_GAMES` 순위표를 열었는데
+(nar-back-repo#547, 2026-10-01) 앱 칩 목록이 LCK·LPL·LEC·LCS·WORLDS 고정이라
+**사용자에게 안 보인다.**
+
 ### 요청: `LeagueOption` 에 필드 3개 추가
 
 ```json
@@ -139,21 +143,37 @@ URL을 주면 앱이 그걸 쓰고, 없으면 번들 아이콘으로 폴백한�
 - 표시 크기가 작으므로(16~24dp) 2x~3x 해상도면 충분하다. 배경은 투명이어야 한다
   (다크 배경 위에 그린다).
 
-### 지금은 요청하지 않는 것 — 순위표 **형식**
+### 순위표 형식 — 백엔드가 이미 `supported`/`reason` 으로 구분한다
 
-리그마다 순위표 형식이 다르다.
+`GET /api/standings?league=` 는 리그별로 아래처럼 응답한다(2026-10-02 prod 확인).
+`StandingsService.SCOPES` 에 등록된 리그만 순위표를 주고, 나머지는
+`supported: false` + `reason` 이다.
 
-| 형식 | 리그 | 앱 구현 |
+| 리그 | 응답 | 비고 |
 |---|---|---|
-| 정규 리그 테이블 | LCK·LPL·LEC·LCS·CBLOL·LCP | 있음 |
-| 스위스 + 토너먼트 | WORLDS | 있음(목업만, 칩은 꺼둠) |
-| 토너먼트만 | MSI·EWC·KESPA·아시안게임·데마시안컵 | 없음 |
+| LCK | `supported: true`, groups 2 | "정규시즌 통산" — 레전드·라이즈 그룹 |
+| ASIAN_GAMES | `supported: true`, groups 2 | "그룹 스테이지". nar-back-repo#547(2026-10-01)로 열렸다 |
+| DEMACIA_CUP | `supported: false`, `UNAVAILABLE` | `SCOPES` 에 "스위스 스테이지"로 등록돼 있으나 네이버 데이터가 아직 없다 |
+| WORLDS·MSI·LPL·LEC·LCS·EWC 등 | `supported: false`, `BRACKET_ONLY` | 스위스·토너먼트라 순위가 없음 |
 
-이번에는 형식 필드(`standingsFormat` 등)를 요청하지 않는다. 지금 켤 수 있는
-LPL·LEC·LCS는 LCK와 **같은 테이블 형식**이라 구분이 필요 없고, 토너먼트 형식은 앱 UI도
-백엔드 응답도 아직 없다. **응답 스키마를 만들 때 형식 값을 같이 정하는 게 맞다** —
-지금 이름만 먼저 박아두면 나중에 만들 API를 거기에 맞춰야 한다. 토너먼트 순위표를 실제로
-지원할 때 별도로 다룬다.
+**즉 "형식"은 백엔드에 이미 있다.** 다만 앱이 `supported`·`reason` 을 **파싱하지 않고**
+있어서(`lib/model/standing.dart`), 리그 코드로 하드코딩 분기(`selectedLeague == 'WORLDS'`)를
+하고 있다. 앱이 이 두 필드를 읽도록 고치는 게 먼저다 — 백엔드 추가 작업 없이 된다.
+
+그래서 이번에 별도 형식 필드(`standingsFormat` 등)는 요청하지 않는다. 필요한 건
+`standings` 칩 노출 여부뿐이고, 실제 형식 분기는 `/api/standings` 응답으로 판단하면 된다.
+
+> **주의 — `standings: true` ≠ 순위표가 나온다.**
+> 위 표대로 LPL·LEC·LCS 는 `BRACKET_ONLY` 라 칩을 켜도 표가 비어 있다. 칩을 켜는 건
+> 백엔드가 그 리그를 `SCOPES` 에 추가한 뒤여야 한다. 지금 당장 켤 수 있는 건
+> ASIAN_GAMES 정도다(앱 칩 목록에 없어서 안 보이는 상태).
+
+앱 쪽 현황:
+
+| 형식 | 리그 | 앱 UI |
+|---|---|---|
+| 그룹/리그 테이블 | LCK, ASIAN_GAMES | 있음 — `groups` 길이 1이면 헤더만 생략, 행 렌더링은 동일 |
+| 스위스 + 토너먼트 | WORLDS | **있음** — 스위스 전적 버킷 + 8강/4강/결승 대진까지 구현(`WorldsStandings`), 목업으로 검증했고 칩만 `live: false` 로 꺼둠 |
 
 ### 배포 순서
 
