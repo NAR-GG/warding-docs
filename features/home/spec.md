@@ -57,7 +57,7 @@
 | 홈 한 번에 받기 | `GET /api/mobile/home` | 새로. 위 다섯 섹션과 솔랭 상태를 한 번에 준다 |
 | 선수 한글 활동명("페이커") | `Player` | 새로. 지금은 `name`(Faker)과 `real_name`(이상혁)만 있다 |
 | 리그 메타(순위표 칩·알림 벨·아이콘) | `MobileScheduleFilterResponse.LeagueOption` | 새로. `standings`·`alarm`·`iconUrl` 세 필드 추가. 지금은 앱에 하드코딩돼 있어 백엔드가 리그를 지원해도 앱 배포 전엔 안 보인다 — 아래 [리그 메타 서버 제어](#리그-메타-서버-제어) 참고 |
-| 리그·시즌 목록 | `GET /api/mobile/schedules/filters` | 있음. 리그는 앱이 2026-10-02부터 이 응답을 쓴다. **`seasons`(year·split·label)도 이미 주는데 앱이 안 쓰고 있다** — 경기 리스트 시즌 필터가 앱 하드코딩이라 갈아끼워야 한다 |
+| 리그·시즌 목록 | `GET /api/mobile/schedules/filters` | 있음. 리그·시즌 모두 앱이 2026-10-02부터 이 응답을 쓴다. `seasons`(year·split·label)는 이미 주고 있었는데 앱 모델이 파싱조차 안 해 하드코딩(`['2025','2026']`)을 쓰고 있었다 — 연결했다. 시즌 필터가 연도 단위라 `year` 만 중복 제거해 쓴다. **스플릿(`2026 Split 1/2/3`)까지 고르게 하려면 필터 UI를 바꿔야 한다 — 미결** |
 
 ## 결정
 
