@@ -157,11 +157,16 @@ URL을 주면 앱이 그걸 쓰고, 없으면 번들 아이콘으로 폴백한�
 | LCK | `supported: true`, groups 2 | "정규시즌 통산" — 레전드·라이즈 그룹 |
 | ASIAN_GAMES | `supported: true`, groups 2 | "그룹 스테이지". nar-back-repo#547(2026-10-01)로 열렸다 |
 | DEMACIA_CUP | `supported: false`, `UNAVAILABLE` | `SCOPES` 에 "스위스 스테이지"로 등록돼 있으나 네이버 데이터가 아직 없다 |
-| WORLDS·MSI·LPL·LEC·LCS·EWC 등 | `supported: false`, `BRACKET_ONLY` | 스위스·토너먼트라 순위가 없음 |
+| WORLDS·MSI·LPL·LEC·LCS·EWC 등 | `supported: false`, `BRACKET_ONLY` | **`SCOPES` 에 없는 리그 전부**가 받는 기본값 |
 
-**즉 "형식"은 백엔드에 이미 있다.** 다만 앱이 `supported`·`reason` 을 **파싱하지 않고**
-있어서(`lib/model/standing.dart`), 리그 코드로 하드코딩 분기(`selectedLeague == 'WORLDS'`)를
-하고 있다. 앱이 이 두 필드를 읽도록 고치는 게 먼저다 — 백엔드 추가 작업 없이 된다.
+> **정정(2026-10-06)**: `BRACKET_ONLY` 를 "스위스·토너먼트라 순위가 없음"으로 적어
+> 뒀는데, `StandingsService` 를 확인하니 **포맷과 무관**하다 — `SCOPES` 조회가
+> 실패하면(`scope == null`) 무조건 붙는 값이라 LPL·LEC·EWC 처럼 그냥 미등록인
+> 리그도 같은 값을 받는다. 앱이 이걸 포맷 신호로 쓰면 오해하므로, 대진 분기는
+> `bracket` 데이터 유무로만 한다(아래 요청 참고).
+
+**즉 형식 분기의 근거가 `reason` 에는 없다.** 앱은 리그 코드 하드코딩
+(`selectedLeague == 'WORLDS'`)으로 분기하고 있었고, 이건 앱에서 고쳤다(2026-10-06).
 
 그래서 이번에 별도 형식 필드(`standingsFormat` 등)는 요청하지 않는다. 필요한 건
 `standings` 칩 노출 여부뿐이고, 실제 형식 분기는 `/api/standings` 응답으로 판단하면 된다.
@@ -211,10 +216,15 @@ ASIAN_GAMES 가 **곧 녹아웃에 들어간다.** 지금 응답은 `scopeLabel:
 새 엔드포인트를 만들지 말고 **지금 쓰는 응답에 필드 하나를 더하는 쪽**을 제안한다.
 리그·시즌 분기, 캐시, 앱의 호출 지점이 전부 그대로 재사용된다.
 
-판단 기준도 이미 있다 — 백엔드는 토너먼트 리그에 **`reason: "BRACKET_ONLY"`** 를
-내려주고 있다(prod 확인: WORLDS·MSI 모두). 이 값이 "이 리그는 표가 아니라 대진"이라는
-뜻이므로, **앱이 리그 코드가 아니라 이 필드로 분기하면 된다.** 지금 앱이
-`selectedLeague == 'WORLDS'` 하드코딩인 게 문제이고, 그건 앱에서 고친다.
+**앱은 `bracket` 이 실려 왔는지로만 분기한다.** 별도의 포맷 플래그를 요청하지 않는다
+— 데이터가 있으면 대진, 없으면 리그 테이블이다. 지금 앱이
+`selectedLeague == 'WORLDS'` 하드코딩인 게 문제이고, 그건 앱에서 고친다(완료).
+
+> `reason: "BRACKET_ONLY"` 는 **쓰지 않는다.** `StandingsService` 를 보면 그 값은
+> 포맷 신호가 아니라 `SCOPES`(현재 LCK·ASIAN_GAMES·DEMACIA_CUP)에 없는 리그 전부에
+> 붙는 기본값이다(`scope == null → unsupported(league, "BRACKET_ONLY")`). 즉
+> LPL·LEC·EWC 처럼 대진 UI 와 무관한 리그도 같은 값을 받으므로, 앱이 이걸로
+> 분기하면 오해한다. **백엔드도 이 값의 의미를 바꿀 필요가 없다** — 앱이 안 본다.
 
 ```jsonc
 {
