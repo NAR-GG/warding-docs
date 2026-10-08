@@ -148,6 +148,8 @@ svg{display:block}
 .pr .v svg{width:11px;height:11px;color:var(--narGuideAccent)}
 .pr .v.rk b{font-size:16px;color:var(--narText)}
 .pr .cv svg{width:14px;height:14px;stroke:var(--narDark200);fill:none;stroke-width:2}
+.more{display:flex;align-items:center;justify-content:center;gap:2px;width:calc(100% - 40px);height:40px;margin:10px 20px 0;border-radius:20px;background:var(--narDark500);border:1px solid var(--narLine);font-size:13px;color:var(--narGray400)}
+.more svg{width:14px;height:14px;stroke:var(--narGray400);fill:none;stroke-width:2}
 .note{margin:8px 20px 0;font-size:11.5px;color:var(--narDark200)}
 .empty{margin:10px 20px 0;border:1px dashed var(--narLine2);border-radius:10px;padding:26px 12px;text-align:center;color:var(--narText2);font-size:12.5px}
 .mybar{position:sticky;bottom:14px;margin:14px 20px 0;padding:13px 15px;border-radius:12px;background:var(--narBgTertiary);border:1px solid var(--narLine2);display:flex;align-items:center;gap:10px;font-size:13px;color:var(--narText2);box-shadow:0 8px 22px var(--narPopupBarrier)}
@@ -325,23 +327,27 @@ function rankScreen(s){
     } else {
       const top = all ? {today:700, week:4000, month:16000}[f] : Math.round(P[s.pl].base/60*{today:.16, week:1, month:4.2}[f]);
       const rank = all ? ALLRANK : MYRANK[s.pl], seed = all ? 2 : s.pl.charCodeAt(0)%7;
-      FANS = Array.from({length:10}, (_,i) => ({n:NICKS[(i+seed)%10], v:Math.round(top*Math.pow(.84,i)), rank:i+1, main:all?MAINS[(i+seed)%10]:s.pl}));
+      // 팬 수는 선수마다 다르다. 100명까지만 목록에 올리고, 채워진 만큼만 보여준다.
+      const count = Math.min(100, all ? 240 : Math.max(12, Math.round(P[s.pl].base/110)));
+      FANS = Array.from({length:count}, (_,i) => ({n:NICKS[(i+seed)%10] + (i>=10 ? (i+1) : ''), v:Math.max(1, Math.round(top*Math.pow(.955,i))), rank:i+1, main:all?MAINS[(i+seed)%10]:s.pl}));
       let myVal = 0;
       if(rank){
-        myVal = Math.round(top*Math.pow(.84,Math.min(rank,30))+180);
-        if(rank <= 10){ FANS.splice(rank-1, 0, {n:'나', v:myVal, me:true, main:all?'Faker':s.pl}); FANS.pop(); FANS.forEach((x,i)=>x.rank=i+1); }
+        myVal = Math.max(1, Math.round(top*Math.pow(.955,Math.min(rank,160))+20));
+        if(rank <= count){ FANS.splice(rank-1, 1, {n:'나', v:myVal, me:true, main:all?'Faker':s.pl}); FANS.forEach((x,i)=>x.rank=i+1); }
       }
-      body = `<div class="ghead">${PLBL[f]} 누적 응원 <em>횟수 순</em></div><div class="plist">${FANS.map((x,i) => `<div class="pr go ${x.me?'me':''}" data-fan="${i}"><span class="no">${i+1}</span>
+      const shown = Math.min(s.shown, FANS.length);
+      body = `<div class="ghead">${PLBL[f]} 누적 응원 <em>횟수 순</em></div><div class="plist">${FANS.slice(0,shown).map((x,i) => `<div class="pr go ${x.me?'me':''}" data-fan="${i}"><span class="no">${i+1}</span>
         <div class="fan-av">${x.me?'나':x.n[0]}</div><div class="b"><div class="n">${x.n}${x.me?'<span class="badge">나</span>':''}</div></div>
         <div class="v">${FL}${fmt(x.v)}</div><span class="cv">${chev}</span></div>`).join('')}</div>
-        <div class="note">${all?'모든 선수에게 보낸 응원을 합친 팬 Top 10이에요.':s.pl+' 선수를 응원한 팬 Top 10이에요.'} 닉네임은 예시예요.</div>`;
+        ${shown < FANS.length ? `<button class="more" type="button" data-more>${Math.min(20, FANS.length-shown)}명 더 보기 ${chev}</button>` : ''}
+        <div class="note">${all?'모든 선수에게 보낸 응원을 합친 팬 순위예요.':s.pl+' 선수를 응원한 팬 순위예요.'} 상위 100명까지 보여요. 닉네임은 예시예요.</div>`;
       my = rank ? `<div class="mybar"><span class="l">내 순위${all?'':' · '+s.pl}</span><b>${rank}위</b><em>${fmt(myVal)}회</em></div>`
                 : `<div class="mybar"><span class="l">아직 응원한 적 없어요</span><span>첫 응원으로 순위에 올라요</span></div>`;
     }
   }
   return `<div class="dh"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span class="t">응원 랭킹</span></div>${tabs}${ctl}${body}${my}`;
 }
-const STATE = {mode:'p', per:'week', pf:'', pl:'', fper:'week'};
+const STATE = {mode:'p', per:'week', pf:'', pl:'', fper:'week', shown:20};
 function renderRank(){
   const sc = document.querySelector('#rank .scroll'); const y = sc.scrollTop;
   sc.innerHTML = rankScreen(STATE); sc.scrollTop = y;
@@ -408,14 +414,15 @@ document.addEventListener('click', e => {
   const t = e.target;
   if(t.closest('[data-close]') || t.id === 'sheet'){ closeSheet(); return; }
   const rk = t.closest('[data-rank]');
-  if(rk){ Object.assign(STATE, {mode:'f', pl:rk.dataset.rank}); closeSheet(); renderRank(); document.getElementById('rank').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  if(rk){ Object.assign(STATE, {mode:'f', pl:rk.dataset.rank, shown:20}); closeSheet(); renderRank(); document.getElementById('rank').scrollIntoView({behavior:'smooth', block:'center'}); return; }
   const stab = t.closest('[data-stab]'); if(stab){ sheetTab = stab.dataset.stab; document.getElementById('sheet')._draw(); return; }
+  const mo = t.closest('[data-more]'); if(mo){ STATE.shown += 20; renderRank(); return; }
   const pf = t.closest('[data-pf]'); if(pf){ STATE.pf = pf.dataset.pf; closeSheet(); renderRank(); return; }
-  const pk = t.closest('[data-pick]'); if(pk){ STATE.pl = pk.dataset.pick; closeSheet(); renderRank(); return; }
+  const pk = t.closest('[data-pick]'); if(pk){ STATE.pl = pk.dataset.pick; STATE.shown = 20; closeSheet(); renderRank(); return; }
   const fn = t.closest('[data-fan]'); if(fn){ fanSheet(+fn.dataset.fan); return; }
   const op = t.closest('[data-open]'); if(op){ op.dataset.open === 'pf' ? filterSheet() : playerSheet(); return; }
   const r = t.closest('#rank [data-rk]');
-  if(r){ const [k,v] = r.dataset.rk.split(':'); if(k==='goto'){ STATE.mode='f'; STATE.pl=v; } else STATE[k] = v; renderRank(); }
+  if(r){ const [k,v] = r.dataset.rk.split(':'); if(k==='goto'){ STATE.mode='f'; STATE.pl=v; } else STATE[k] = v; STATE.shown = 20; renderRank(); }
 });
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSheet(); });
 
