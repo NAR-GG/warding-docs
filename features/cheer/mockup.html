@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warding 응원 버튼</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<style>
+/* 색은 tokens.css 변수만 쓴다. 폰트·치수만 여기서 정한다. */
+:root{
+  --ui:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --os:"Open Sans",-apple-system,"Noto Sans KR",system-ui,sans-serif;
+  --heat:.2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--narBgContent);color:var(--narText);font-family:var(--ui);font-size:14px;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:36px 24px 72px}
+h1{font-weight:700;font-size:26px;margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--narText2);margin:0 0 28px;max-width:70ch;font-size:14px}
+.row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:10px}
+.cap{font-family:var(--os);font-weight:600;font-size:12px;letter-spacing:.1em;color:var(--narText2)}
+.cap em{font-style:normal;color:var(--narDark200);letter-spacing:0;margin-left:6px}
+button{font:inherit;color:inherit;cursor:pointer}
+svg{display:block}
+
+/* 폰 */
+.phone{position:relative;width:375px;height:812px;background:var(--narDark800);border-radius:44px;border:1px solid var(--narDark500);overflow:hidden}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:var(--gray100);border-radius:20px;z-index:6}
+.sb{height:54px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-weight:600;font-size:15px}
+.screen{position:absolute;inset:54px 0 0 0;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;position:relative}
+.scroll::-webkit-scrollbar{display:none}
+.fade::after{content:"";position:sticky;display:block;left:0;right:0;bottom:0;height:110px;margin-top:-110px;background:linear-gradient(180deg,transparent,var(--narDark800) 75%);pointer-events:none}
+
+/* 상단 */
+.top{display:flex;justify-content:space-between;align-items:center;padding:6px 20px 8px;height:50px}
+.wordmark{font-weight:700;font-size:22px;display:flex;align-items:center;gap:6px}
+.wordmark::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--narBg)}
+.bell{width:40px;height:40px;border-radius:50%;background:var(--narBgTertiary);display:grid;place-items:center;position:relative}
+.bell svg{width:20px;height:20px;stroke:var(--narTextGnbDefault);fill:none;stroke-width:1.8}
+.bell i{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--liveAccent);font:700 11px/1 var(--os);font-style:normal;display:grid;place-items:center;border:2px solid var(--narDark800)}
+
+/* 솔랭 카드 + 응원 영역 */
+.heroswipe{display:flex;gap:10px;padding:6px 20px 0;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.heroswipe::-webkit-scrollbar{display:none}
+.hcol{flex:0 0 335px;scroll-snap-align:center;border-radius:14px;box-shadow:0 0 calc(8px + 24px*var(--heat)) color-mix(in srgb,var(--narChipActive) calc(var(--heat)*35%),transparent),0 0 0 1px color-mix(in srgb,var(--narChipActive) calc(var(--heat)*60%),transparent);transition:box-shadow .25s}
+.hero{position:relative;height:206px;border-radius:14px 14px 0 0;overflow:hidden;isolation:isolate;background:var(--narDark600);border:1px solid var(--narLine);border-bottom:0}
+.hero .bg{position:absolute;inset:0}
+.hero .bg img{width:100%;height:100%;object-fit:cover;object-position:52% 22%}
+.hero .scrim{position:absolute;inset:0;background:linear-gradient(90deg,var(--narDark800) 0%,var(--narDarkOpacity62) 55%,transparent),var(--narPlayedChampOverlay)}
+.hero .ph{position:absolute;right:-6px;bottom:-10px;width:176px;height:214px}
+.hero .ph img{width:100%;height:100%;object-fit:contain;object-position:bottom center}
+.hero .body{position:absolute;left:15px;top:13px;right:126px;bottom:13px;display:flex;flex-direction:column}
+.hero .team{display:flex;align-items:center;gap:6px;font-family:var(--os);font-weight:600;font-size:12px;color:var(--narGray400)}
+.hero .team img{width:18px;height:18px;object-fit:contain}
+.hero .nick{font-weight:700;font-size:27px;line-height:1.1;margin-top:6px}
+.hero .clock{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
+.hero .clock b{font:700 30px/1 var(--os);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hero .clock span{font-family:var(--os);font-size:11px;color:var(--narText2);padding-bottom:3px}
+.pill{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:8px;background:var(--narRatingBannerBg);border:1px solid var(--narWhiteBorder15);font-weight:600;font-size:12px}
+.pill::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--narText)}
+.champtag{position:absolute;right:10px;top:10px;height:22px;padding:0 9px;border-radius:11px;background:var(--narDarkOpacity62);font-family:var(--os);font-weight:600;font-size:10.5px;color:var(--narGray400);display:flex;align-items:center;gap:5px}
+.champtag b{width:5px;height:5px;border-radius:50%;background:var(--narText);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.3}}
+
+.cheer{background:var(--narBgTertiary);border:1px solid var(--narLine);border-top:1px solid var(--narDark500);border-radius:0 0 14px 14px;overflow:hidden}
+.crow{display:flex;align-items:center;gap:10px;height:74px;padding:0 12px 0 15px}
+.cl{flex:1;min-width:0}
+.l1{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--narText2)}
+.l1 svg{width:12px;height:12px;color:var(--narGuideAccent)}
+.l2{display:flex;align-items:baseline;gap:7px}
+.total{font:700 26px/1.15 var(--os);font-variant-numeric:tabular-nums;letter-spacing:-.01em;transform-origin:left}
+.total.bump{animation:bump .18s ease-out}
+@keyframes bump{40%{transform:scale(1.06)}}
+.mine{font:700 14px var(--os);color:var(--narGuideAccent);font-variant-numeric:tabular-nums}
+.bw{position:relative;flex:none}
+.cbtn{display:inline-flex;align-items:center;gap:6px;height:46px;padding:0 18px;border:0;border-radius:23px;background:var(--narBg);color:var(--narText);font-weight:700;font-size:15px;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .08s}
+.cbtn svg{width:16px;height:16px}
+.cbtn.down{transform:scale(.93)}
+.fx{position:absolute;left:50%;top:2px;pointer-events:none;font:700 15px/1 var(--os);color:var(--narGuideAccent);animation:rise .8s ease-out forwards}
+@keyframes rise{from{transform:translate(var(--dx),0) scale(.8);opacity:1}to{transform:translate(var(--dx),-60px) scale(1.15);opacity:0}}
+.cfoot{display:flex;align-items:center;justify-content:space-between;height:38px;padding:0 15px;border-top:1px solid var(--narLine);background:var(--narTodayBg);font-size:12px;color:var(--narText2);cursor:pointer}
+.cfoot .t{color:var(--narGray400);font-weight:600}
+.cfoot .go{display:inline-flex;align-items:center;gap:3px}
+.cfoot b{font-family:var(--os);font-weight:700;color:var(--narText)}
+.cfoot svg{width:13px;height:13px;stroke:var(--narGray400);fill:none;stroke-width:2.2}
+.dots{display:flex;justify-content:center;gap:5px;padding:10px 0 0}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--narLine2)}
+.dots i.on{width:14px;border-radius:3px;background:var(--narGray400)}
+
+/* 끝난 경기 줄 */
+.donerow{font:600 10px var(--os);letter-spacing:.09em;color:var(--narDark200);padding:18px 20px 0}
+.donerow em{font-style:normal;letter-spacing:0;font-weight:400;margin-left:6px;color:var(--narDark300)}
+.solorow{display:flex;gap:8px;padding:10px 20px 0;overflow-x:auto;scrollbar-width:none}
+.solorow::-webkit-scrollbar{display:none}
+.sp{flex:none;display:flex;align-items:center;gap:7px;height:44px;padding:0 12px 0 6px;border-radius:22px;background:var(--narBgTertiary);border:1px solid var(--narLine)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--narLine2);overflow:hidden;flex:none}
+.av img{width:100%;height:100%;object-fit:cover;object-position:center 12%;transform:scale(1.15)}
+.sp .n{font-weight:600;font-size:12.5px}
+.sp .s{font:400 10px var(--os);color:var(--narText2);display:flex;align-items:center;gap:4px}
+.sp .s.w{color:var(--scoreWin)} .sp .s.l{color:var(--narDark200)}
+.sp .s .ft{display:inline-flex;align-items:center;gap:2px;color:var(--narGuideAccent);font-variant-numeric:tabular-nums}
+.sp .s .ft svg{width:9px;height:9px}
+.soloall{margin:10px 20px 0;height:40px;border-radius:20px;background:var(--narDark500);border:1px solid var(--narLine);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--narGray400)}
+.soloall svg{width:14px;height:14px;stroke:var(--narGray400);fill:none;stroke-width:2;margin-left:2px}
+
+/* 랭킹 화면 */
+.dh{display:flex;align-items:center;gap:10px;padding:6px 20px 8px;height:50px}
+.dh svg{width:24px;height:24px;stroke:var(--narText);fill:none;stroke-width:2}
+.dh .t{font-weight:700;font-size:18px}
+.rktabs{display:flex;margin:6px 20px 0;border-bottom:1px solid var(--narLine)}
+.rktabs span{flex:1;text-align:center;padding:11px 0;font-weight:500;font-size:15px;color:var(--narText2);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+.rktabs span.on{color:var(--narText);font-weight:700;border-image:var(--narBg) 1;border-bottom:2px solid}
+.rkrow{display:flex;align-items:center;gap:10px;padding:12px 20px 0}
+.plsel{flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:42px;padding:0 10px 0 5px;border-radius:12px;background:var(--narBgTertiary);border:1px solid var(--narLine);cursor:pointer}
+.plsel .av{display:grid;place-items:center;color:var(--narGuideAccent)}
+.plsel .av svg{width:16px;height:16px}
+.plsel .av.pos{font-weight:700;font-size:13px;color:var(--narGray400)}
+.plsel .nm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plsel .dd{margin-left:auto;flex:none}
+.plsel .dd svg{width:15px;height:15px;stroke:var(--narGray400);fill:none;stroke-width:2.2;transform:rotate(90deg)}
+.badge{font:600 10px var(--os);color:var(--narViolet3);background:var(--narChipBadgeBg);border-radius:8px;padding:2px 7px;flex:none}
+.sgc{display:inline-flex;padding:3px;border-radius:10px;background:var(--narBgTertiary);border:1px solid var(--narLine);flex:none}
+.sgc span{padding:6px 9px;border-radius:7px;font-weight:600;font-size:12.5px;color:var(--narText2);cursor:pointer;white-space:nowrap}
+.sgc span.on{background:var(--narDark500);color:var(--narText);box-shadow:inset 0 0 0 1px var(--narLine2)}
+.ghead{padding:16px 20px 2px;font:600 10px var(--os);letter-spacing:.09em;color:var(--narDark200)}
+.ghead em{font-style:normal;letter-spacing:0;font-weight:400;margin-left:6px;color:var(--narDark300)}
+.plist{margin:10px 20px 0;background:var(--narBgTertiary);border-radius:12px;border:1px solid var(--narLine);overflow:hidden}
+.pr{display:flex;align-items:center;gap:11px;padding:11px 13px;border-top:1px solid var(--narLine)}
+.pr:first-child{border-top:0}
+.pr.go,.pr.pick{cursor:pointer}
+.pr.me,.pr.pick.on{background:var(--narTodayBg)}
+.pr .no{width:18px;flex:none;text-align:center;font:700 14px var(--os);color:var(--narDark200);font-variant-numeric:tabular-nums}
+.pr .face{position:relative;width:40px;height:40px;flex:none}
+.pr .face .im{position:absolute;inset:0;border-radius:50%;background:var(--narLine2);overflow:hidden}
+.pr .face .im img{width:100%;height:100%;object-fit:cover;object-position:center 12%;transform:scale(1.15)}
+.pr .face .tl{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;background:var(--narDark800);border:1px solid var(--narLine2);display:grid;place-items:center}
+.pr .face .tl img{width:12px;height:12px;object-fit:contain}
+.fan-av{width:40px;height:40px;border-radius:50%;background:var(--narLine2);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--narGray400);flex:none}
+.fan-av.lg{width:52px;height:52px;font-size:16px}
+.pr .b{flex:1;min-width:0}
+.pr .n{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px}
+.pr .n small{font:400 11px var(--os);color:var(--narText2)}
+.pr .st2{font:400 11px var(--os);color:var(--narDark200);margin-top:2px}
+.pr .v{display:flex;align-items:center;gap:4px;flex:none;font:700 13.5px var(--os);color:var(--narGray400);font-variant-numeric:tabular-nums}
+.pr .v svg{width:11px;height:11px;color:var(--narGuideAccent)}
+.pr .v.rk b{font-size:16px;color:var(--narText)}
+.pr .cv svg{width:14px;height:14px;stroke:var(--narDark200);fill:none;stroke-width:2}
+.more{display:flex;align-items:center;justify-content:center;gap:2px;width:calc(100% - 40px);height:40px;margin:10px 20px 0;border-radius:20px;background:var(--narDark500);border:1px solid var(--narLine);font-size:13px;color:var(--narGray400)}
+.more svg{width:14px;height:14px;stroke:var(--narGray400);fill:none;stroke-width:2}
+.note{margin:8px 20px 0;font-size:11.5px;color:var(--narDark200)}
+.empty{margin:10px 20px 0;border:1px dashed var(--narLine2);border-radius:10px;padding:26px 12px;text-align:center;color:var(--narText2);font-size:12.5px}
+.mybar{position:sticky;bottom:14px;margin:14px 20px 0;padding:13px 15px;border-radius:12px;background:var(--narBgTertiary);border:1px solid var(--narLine2);display:flex;align-items:center;gap:10px;font-size:13px;color:var(--narText2);box-shadow:0 8px 22px var(--narPopupBarrier)}
+.mybar .l{flex:1}
+.mybar b{font:700 16px var(--os);color:var(--narText);font-variant-numeric:tabular-nums}
+.mybar em{font:400 12.5px var(--os);font-style:normal;min-width:62px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* 시트 (폰 안에서 올라온다) */
+.sheet-bg{position:absolute;inset:0;z-index:20;background:var(--narPopupBarrier);display:flex;align-items:flex-end}
+.sheet{width:100%;max-height:82%;display:flex;flex-direction:column;background:var(--narBgSecondary);border-radius:20px 20px 0 0;border:1px solid var(--narLine);border-bottom:0}
+.sh-h{display:flex;align-items:center;justify-content:center;position:relative;height:54px;flex:none}
+.sh-h .t{font-weight:700;font-size:16px}
+.sh-h .x{position:absolute;right:20px;font-size:13px;color:var(--narText2);cursor:pointer;padding:8px 0}
+.sh-b{overflow-y:auto;padding-bottom:24px;scrollbar-width:none}
+.srch{margin:0 20px;height:38px;border-radius:10px;background:var(--narBgTertiary);border:1px solid var(--narLine);display:flex;align-items:center;gap:8px;padding:0 13px;flex:none}
+.srch svg{width:15px;height:15px;stroke:var(--narDark200);fill:none;stroke-width:2;flex:none}
+.srch input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--narText);font:inherit;font-size:14px}
+.tabs2{display:flex;gap:6px;padding:12px 20px 0;flex:none}
+.tabs2 span{height:30px;padding:0 13px;border-radius:15px;border:1px solid var(--narLine2);font-weight:600;font-size:12px;color:var(--narText3);display:flex;align-items:center;gap:5px;cursor:pointer}
+.tabs2 span.on{background:var(--narChipSelectedBg);border-color:var(--narChipActive);color:var(--narText)}
+.tabs2 i{font:normal 10px var(--os);color:var(--narDark200)}
+.pickrow{display:flex;align-items:center;gap:11px;padding:11px 13px;border-top:1px solid var(--narLine);cursor:pointer}
+.pickrow:first-child{border-top:0}
+.pickrow.on{background:var(--narTodayBg)}
+.pickrow .ic{width:32px;height:32px;border-radius:50%;background:var(--narLine2);display:grid;place-items:center;flex:none;overflow:hidden;color:var(--narGuideAccent)}
+.pickrow .ic img{width:20px;height:20px;object-fit:contain}
+.pickrow .ic svg{width:15px;height:15px}
+.pickrow .ic b{font-size:13px;color:var(--narGray400)}
+.pickrow .n{font-weight:600;font-size:14px}
+.pickrow .st2{font:400 11px var(--os);color:var(--narDark200);margin-top:1px}
+.pickrow .ck,.pr .ck{margin-left:auto;color:var(--narText);font-weight:700}
+.thead{display:flex;align-items:center;gap:6px;padding:16px 20px 0}
+.thead img{width:18px;height:18px;object-fit:contain}
+.thead .c{font:600 12px var(--os);color:var(--narGray400)}
+.thead em{font:normal 11px var(--os);color:var(--narDark200)}
+.fd-sum{display:flex;align-items:center;gap:13px;padding:2px 20px 6px}
+.fd-n{font-weight:700;font-size:18px}
+.fd-s{font:400 12.5px var(--os);color:var(--narText2);margin-top:2px}
+.fd-s b{color:var(--narText);font-weight:700}
+.fd-bar{height:4px;border-radius:2px;background:var(--narLine);margin-top:7px;overflow:hidden}
+.fd-bar i{display:block;height:100%;background:var(--narBg);border-radius:2px}
+
+@media(max-width:430px){.wrap{padding:16px 8px 56px}.phone{width:100%;max-width:375px}}
+@media(prefers-reduced-motion:reduce){.fx{display:none}.total.bump,.champtag b{animation:none}.hcol{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="flame" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 2.2c.5 3.4 3.2 5.3 4.7 7.7 1.8 2.8 1.2 6.6-1.2 9a6.1 6.1 0 0 1-8.6.3c-1.9-1.8-2.4-4.6-1.3-6.9.4 1.3 1.2 2.1 2.2 2.4-.7-3.9.9-9 4.2-12.5z"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+</svg>
+
+<div class="wrap">
+  <h1>Warding 응원 버튼</h1>
+  <p class="lede">홈의 솔랭 카드 아래에 응원 영역을 붙이고, 응원 랭킹 화면(선수·팬)을 더한 목업이다. 선수 사진·챔피언 스플래시·팀 로고는 실데이터이고, <b>응원 수치·순위·팬 닉네임은 전부 예시</b>다. 버튼을 눌러보고, 카드 아래 <b>응원 랭킹</b> 줄을 누르면 오른쪽 폰이 그 선수 팬 랭킹으로 열린다.</p>
+  <div class="row" id="phones"></div>
+</div>
+
+<script>
+/* ---------- 데이터 ---------- */
+// 선수 사진·팀 로고: /api/players/cards 의 playerImageUrl·teamImageUrl. 팀·포지션은 2026-10-09 기준.
+const P = {
+  Faker:    {team:'T1',  pos:'미드', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087499078_LCK_T1_Faker_F.PNG', base:21870},
+  Doran:    {team:'T1',  pos:'탑',   img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087520664_LCK_T1_Doran_F.PNG', base:14305},
+  Chovy:    {team:'GEN', pos:'미드', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842975847_LCK_GEN_Chovy_F.png', base:11200},
+  Showmaker:{team:'DK',  pos:'미드', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842721951_LCK_DK_Showmaker_F.png', base:9712},
+  Zeus:     {team:'HLE', pos:'탑',   img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089435131_LCK_HLE_Zeus_F.PNG', base:9480},
+  Gumayusi: {team:'HLE', pos:'원딜', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769089421483_LCK_HLE_Gumayusi_F.PNG', base:8870},
+  Oner:     {team:'T1',  pos:'정글', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087509929_LCK_T1_Oner_F.PNG', base:7640},
+  Canyon:   {team:'GEN', pos:'정글', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842984822_LCK_GEN_Canyon_F.PNG', base:7210},
+  Ruler:    {team:'GEN', pos:'원딜', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842957393_LCK_GEN_Ruler_F.PNG', base:6120},
+  Keria:    {team:'T1',  pos:'서폿', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087515444_LCK_T1_Keria_F.PNG', base:5530},
+  Kiin:     {team:'GEN', pos:'탑',   img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1778842963805_LCK_GEN_Kiin_F.PNG', base:4300},
+  Peyz:     {team:'T1',  pos:'원딜', img:'https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_500,c_limit/https://static.lolesports.com/players/1769087491906_LCK_T1_Peyz_F.PNG', base:3980},
+};
+const TEAM_LOGO = {"GEN": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1773829250929_GENGLOGO_GOLD.png", "T1": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1726801573959_539px-T1_2019_full_allmode.png", "HLE": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1631819564399_hle-2021-worlds.png", "DK": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1673260049703_DPlusKIALOGO11.png", "KT": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/kt_darkbackground.png", "BFX": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1734691810721_BFXfullcolorfordarkbg.png", "BRO": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1716454325887_Nowyprojekt.png", "NS": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/NSFullonDark.png", "KRX": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1774247803537_horizontal_EN_Wh.png", "DNS": "https://res.cloudinary.com/dvvurdffw/image/fetch/f_webp,q_auto,w_200,c_limit/https://static.lolesports.com/teams/1767340467921_DN_SOOPerslogo_profile.webp"};
+const SPLASH = n => `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${n}_0.jpg`;
+const LIVE = [['Faker','Ahri','아리',1452],['Zeus','Gwen','그웬',422]];
+const DONE = [['Doran','승','w',118,8204],['Oner','승','w',12,6120],['Keria','패','l',40,2310],['Peyz','패','l',95,1105]];
+const SUB = new Set(['Faker','Chovy','Zeus','Keria','Doran']);   // 내 구독 선수(예시)
+const MYRANK = {Faker:37, Chovy:12, Zeus:58, Keria:24, Doran:3};  // 선수 팬 중 내 순위(예시)
+const ALLRANK = 128, SUBRANK = 41;
+const NICKS = ['미드갈래','롤린','야간순찰','고양이집사','탑솔러','원딜장인','핑크데이','시즌권','새벽팬','불꽃연타'];
+const MAINS = ['Faker','Doran','Chovy','Zeus','Faker','Keria','Showmaker','Faker','Oner','Gumayusi'];
+const PER = [['today','오늘'],['week','이번 주'],['month','이번 달']];
+const PLBL = {today:'오늘', week:'이번 주', month:'이번 달'};
+const MUL = {today:1, week:6.2, month:26};
+const POSLIST = ['탑','정글','미드','원딜','서폿'];
+
+const CHEER = {Faker:12408, Zeus:4210, Doran:8204, Keria:2310};
+const MINE = {};
+const fmt = n => n.toLocaleString('ko-KR');
+const ico = (id, cls='') => `<svg class="${cls}" viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const FL = ico('flame');
+const chev = ico('chev');
+const logo = t => TEAM_LOGO[t] ? `<img src="${TEAM_LOGO[t]}" alt="${t}">` : '';
+const face = n => `<img src="${P[n].img}" alt="${n}">`;
+
+/* ---------- 홈 ---------- */
+function card([name, champ, champKo, from]){
+  const p = P[name];
+  return `<div class="hcol">
+    <div class="hero">
+      <div class="bg"><img src="${SPLASH(champ)}" alt=""></div><div class="scrim"></div>
+      <span class="champtag"><b></b>${champKo} 플레이 중</span>
+      <div class="body">
+        <div class="team">${logo(p.team)} ${p.team}</div>
+        <div class="nick">${name}</div>
+        <div class="clock"><b class="clk" data-t="${from}">--:--</b><span>진행 중</span></div>
+        <span class="pill">솔로 랭크</span>
+      </div>
+      <div class="ph">${face(name)}</div>
+    </div>
+    <div class="cheer">
+      <div class="crow">
+        <div class="cl">
+          <div class="l1">${FL}이 판 응원</div>
+          <div class="l2"><span class="total" data-p="${name}">${fmt(CHEER[name])}</span><span class="mine" data-p="${name}">+0</span></div>
+        </div>
+        <div class="bw"><button class="cbtn" type="button" data-cheer="${name}" aria-label="${name} 응원하기">${FL}응원하기</button></div>
+      </div>
+      <div class="cfoot" role="button" tabindex="0" data-rank="${name}"><span class="t">응원 랭킹</span><span class="go">내 순위 <b>${MYRANK[name]}위</b>${chev}</span></div>
+    </div>
+  </div>`;
+}
+const mins = m => m < 60 ? `${m}분 전` : `${Math.floor(m/60)}시간 전`;
+function home(){
+  const chips = DONE.map(([n,r,k,m,c]) => `<div class="sp"><div class="av">${face(n)}</div><div><div class="n">${n}</div><div class="s ${k}">${mins(m)} · ${r}<span class="ft">${FL}${fmt(c)}</span></div></div></div>`).join('');
+  return `<div class="col"><div class="cap">홈 <em>응원 영역은 솔랭 카드 하단에 붙는다 · 눌러보기</em></div>
+    <div class="phone"><div class="notch"></div><div class="sb"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+    <div class="screen">
+      <div class="top"><div class="wordmark">Warding</div><div class="bell"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i>3</i></div></div>
+      <div class="scroll fade">
+        <div class="heroswipe">${LIVE.map(card).join('')}</div>
+        <div class="dots"><i class="on"></i><i></i></div>
+        <div class="donerow">오늘 끝난 경기 <em>선수당 최신 1건 · 응원 합계</em></div>
+        <div class="solorow">${chips}</div>
+        <div class="soloall">구독 27명 전체 ${chev}</div>
+      </div>
+    </div></div></div>`;
+}
+
+/* ---------- 응원 랭킹 ---------- */
+let FANS = [];
+const seg = (k, items, cur) => `<div class="sgc">${items.map(([v,l]) => `<span class="${cur===v?'on':''}" data-rk="${k}:${v}">${l}</span>`).join('')}</div>`;
+const pref = n => `<div class="face"><div class="im">${face(n)}</div><span class="tl">${logo(P[n].team)}</span></div>`;
+
+function rankScreen(s){
+  const tabs = `<div class="rktabs"><span class="${s.mode==='p'?'on':''}" data-rk="mode:p">선수 랭킹</span><span class="${s.mode==='f'?'on':''}" data-rk="mode:f">팬 랭킹</span></div>`;
+  let ctl, body, my = '';
+  if(s.mode === 'p'){
+    const pf = s.pf;
+    const label = !pf ? '모든 선수' : pf==='sub' ? '내 구독 선수' : pf.slice(pf.indexOf(':')+1);
+    const icon = !pf ? `<div class="av">${FL}</div>` : pf==='sub' ? `<div class="av">${FL}</div>` : pf.startsWith('team:') ? `<div class="av">${logo(pf.slice(5))}</div>` : `<div class="av pos">${label[0]}</div>`;
+    ctl = `<div class="rkrow"><div class="plsel" role="button" tabindex="0" data-open="pf">${icon}<span class="nm">${label}</span><span class="dd">${chev}</span></div>${seg('per', PER, s.per)}</div>`;
+    const keep = n => !pf ? true : pf==='sub' ? SUB.has(n) : pf.startsWith('team:') ? P[n].team===pf.slice(5) : P[n].pos===pf.slice(4);
+    const list = Object.keys(P).filter(keep).map(n => ({n, v:Math.round(P[n].base*MUL[s.per]/10)*10})).sort((a,b)=>b.v-a.v);
+    body = list.length ? `<div class="plist">${list.map((x,i) => `<div class="pr go ${SUB.has(x.n)?'me':''}" data-rk="goto:${x.n}"><span class="no">${i+1}</span>${pref(x.n)}
+      <div class="b"><div class="n">${x.n}${SUB.has(x.n)?'<span class="badge">구독</span>':''}</div><div class="st2">${P[x.n].team} · ${P[x.n].pos}</div></div>
+      <div class="v">${FL}${fmt(x.v)}</div><span class="cv">${chev}</span></div>`).join('')}</div>` : `<div class="empty">조건에 맞는 선수가 없어요</div>`;
+    body += `<div class="note">선수를 누르면 그 선수의 팬 랭킹으로 가요.</div>`;
+  } else {
+    const all = !s.pl, grp = s.pl === '__sub';
+    const icon = all || grp ? `<div class="av">${FL}</div>` : `<div class="av">${face(s.pl)}</div>`;
+    const label = all ? '전체 선수' : grp ? '내 구독 선수' : s.pl;
+    ctl = `<div class="rkrow"><div class="plsel" role="button" tabindex="0" data-open="pl">${icon}<span class="nm">${label}</span>${!all&&!grp&&SUB.has(s.pl)?'<span class="badge">구독</span>':''}<span class="dd">${chev}</span></div>${seg('fper', PER, s.fper)}</div>`;
+    const f = s.fper;
+    if(grp){
+      // 구독 선수는 합치지 않고 선수 단위로 보여준다
+      const mul = {today:.16, week:1, month:4.2}[f];
+      const rows = [...SUB].map(n => { const rk = MYRANK[n]; return {n, rk, v:Math.round(Math.round(P[n].base/60*mul)*Math.pow(.84,Math.min(rk,30))+180*mul)}; }).sort((a,b)=>a.rk-b.rk);
+      body = `<div class="ghead">구독 선수별 내 순위 <em>${PLBL[f]}</em></div><div class="plist">${rows.map(x => `<div class="pr go" data-rk="goto:${x.n}">${pref(x.n)}
+        <div class="b"><div class="n">${x.n}<small>${P[x.n].team} · ${P[x.n].pos}</small></div><div class="st2">내 응원 ${fmt(x.v)}회</div></div>
+        <div class="v rk"><b>${x.rk}위</b></div><span class="cv">${chev}</span></div>`).join('')}</div><div class="note">선수를 누르면 그 선수 팬 랭킹으로 가요.</div>`;
+    } else {
+      const top = all ? {today:700, week:4000, month:16000}[f] : Math.round(P[s.pl].base/60*{today:.16, week:1, month:4.2}[f]);
+      const rank = all ? ALLRANK : MYRANK[s.pl], seed = all ? 2 : s.pl.charCodeAt(0)%7;
+      // 팬 수는 선수마다 다르다. 100명까지만 목록에 올리고, 채워진 만큼만 보여준다.
+      const count = Math.min(100, all ? 240 : Math.max(12, Math.round(P[s.pl].base/110)));
+      FANS = Array.from({length:count}, (_,i) => ({n:NICKS[(i+seed)%10] + (i>=10 ? (i+1) : ''), v:Math.max(1, Math.round(top*Math.pow(.955,i))), rank:i+1, main:all?MAINS[(i+seed)%10]:s.pl}));
+      let myVal = 0;
+      if(rank){
+        myVal = Math.max(1, Math.round(top*Math.pow(.955,Math.min(rank,160))+20));
+        if(rank <= count){ FANS.splice(rank-1, 1, {n:'나', v:myVal, me:true, main:all?'Faker':s.pl}); FANS.forEach((x,i)=>x.rank=i+1); }
+      }
+      const shown = Math.min(s.shown, FANS.length);
+      body = `<div class="ghead">${PLBL[f]} 누적 응원 <em>횟수 순</em></div><div class="plist">${FANS.slice(0,shown).map((x,i) => `<div class="pr go ${x.me?'me':''}" data-fan="${i}"><span class="no">${i+1}</span>
+        <div class="fan-av">${x.me?'나':x.n[0]}</div><div class="b"><div class="n">${x.n}${x.me?'<span class="badge">나</span>':''}</div></div>
+        <div class="v">${FL}${fmt(x.v)}</div><span class="cv">${chev}</span></div>`).join('')}</div>
+        ${shown < FANS.length ? `<button class="more" type="button" data-more>${Math.min(20, FANS.length-shown)}명 더 보기 ${chev}</button>` : ''}
+        <div class="note">${all?'모든 선수에게 보낸 응원을 합친 팬 순위예요.':s.pl+' 선수를 응원한 팬 순위예요.'} 상위 100명까지 보여요. 닉네임은 예시예요.</div>`;
+      my = rank ? `<div class="mybar"><span class="l">내 순위${all?'':' · '+s.pl}</span><b>${rank}위</b><em>${fmt(myVal)}회</em></div>`
+                : `<div class="mybar"><span class="l">아직 응원한 적 없어요</span><span>첫 응원으로 순위에 올라요</span></div>`;
+    }
+  }
+  return `<div class="dh"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span class="t">응원 랭킹</span></div>${tabs}${ctl}${body}${my}`;
+}
+const STATE = {mode:'p', per:'week', pf:'', pl:'', fper:'week', shown:20};
+function renderRank(){
+  const sc = document.querySelector('#rank .scroll'); const y = sc.scrollTop;
+  sc.innerHTML = rankScreen(STATE); sc.scrollTop = y;
+}
+function rankPhone(){
+  return `<div class="col"><div class="cap">응원 랭킹 <em>탭·칩·행 눌러보기</em></div>
+    <div class="phone" id="rank"><div class="notch"></div><div class="sb"><span>9:41</span><span>●●● ᯤ ▮</span></div>
+    <div class="screen"><div class="scroll">${rankScreen(STATE)}</div></div></div></div>`;
+}
+
+/* ---------- 시트 ---------- */
+const sheetHost = () => document.getElementById('rank');
+function openSheet(html){ closeSheet(); const el = document.createElement('div'); el.className = 'sheet-bg'; el.id = 'sheet'; el.innerHTML = html; sheetHost().appendChild(el); return el; }
+function closeSheet(){ document.getElementById('sheet')?.remove(); }
+const row = (attr, val, cur, ic, label, sub) => `<div class="pickrow ${cur===val?'on':''}" ${attr}="${val}"><span class="ic">${ic}</span><div><div class="n">${label}</div>${sub?`<div class="st2">${sub}</div>`:''}</div><span class="ck">${cur===val?'✓':''}</span></div>`;
+const cnt = f => Object.keys(P).filter(f).length;
+
+function filterSheet(){ // 선수 랭킹의 선수 필터
+  const cur = STATE.pf, teams = [...new Set(Object.values(P).map(p=>p.team))];
+  openSheet(`<div class="sheet" role="dialog" aria-label="선수 필터"><div class="sh-h"><span class="t">선수 필터</span><span class="x" data-close>닫기</span></div><div class="sh-b">
+    <div class="ghead" style="padding-top:4px">바로 보기</div>
+    <div class="plist">${row('data-pf','',cur,FL,'모든 선수',cnt(()=>true)+'명 전체')}${row('data-pf','sub',cur,FL,'내 구독 선수만',cnt(n=>SUB.has(n))+'명')}</div>
+    <div class="ghead">팀별</div><div class="plist">${teams.map(t=>row('data-pf','team:'+t,cur,logo(t),t,cnt(n=>P[n].team===t)+'명')).join('')}</div>
+    <div class="ghead">포지션별</div><div class="plist">${POSLIST.map(p=>row('data-pf','pos:'+p,cur,`<b>${p[0]}</b>`,p,cnt(n=>P[n].pos===p)+'명')).join('')}</div>
+  </div></div>`);
+}
+let sheetTab = 'mine';
+function playerSheet(){ // 팬 랭킹의 선수 필터
+  const cur = STATE.pl; sheetTab = (!cur || cur==='__sub' || SUB.has(cur)) ? 'mine' : 'all';
+  const el = openSheet(`<div class="sheet" role="dialog" aria-label="선수 필터"><div class="sh-h"><span class="t">선수 필터</span><span class="x" data-close>닫기</span></div>
+    <div class="srch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="sq" type="search" placeholder="전체 선수에서 검색" autocomplete="off"></div>
+    <div class="sh-b"><div class="ghead">바로 보기</div>
+      <div class="plist">${row('data-pick','',cur,FL,'모든 선수','전체 팬이 응원한 합계')}${row('data-pick','__sub',cur,FL,'내 구독 선수만',`구독한 ${SUB.size}명, 선수별 내 순위로 봐요`)}</div>
+      <div class="ghead">선수별</div><div class="tabs2" id="st"></div><div id="sb"></div></div></div>`);
+  const draw = () => {
+    const q = el.querySelector('#sq').value.trim().toLowerCase();
+    el.querySelector('#st').innerHTML = `<span class="${sheetTab==='mine'?'on':''}" data-stab="mine">내 구독 선수 <i>${SUB.size}</i></span><span class="${sheetTab==='all'?'on':''}" data-stab="all">전체 선수 <i>${Object.keys(P).length}</i></span>`;
+    const pr = n => `<div class="pr pick ${n===cur?'on':''}" data-pick="${n}">${pref(n)}<div class="b"><div class="n">${n}${SUB.has(n)?'<span class="badge">구독</span>':''}</div><div class="st2">${P[n].team} · ${P[n].pos}</div></div><span class="ck">${n===cur?'✓':''}</span></div>`;
+    let h;
+    if(sheetTab === 'mine' && !q) h = `<div class="plist">${[...SUB].map(pr).join('')}</div>`;
+    else {
+      const by = {}; Object.keys(P).filter(n => !q || n.toLowerCase().includes(q)).forEach(n => (by[P[n].team] ??= []).push(n));
+      h = Object.entries(by).map(([t,ns]) => `<div class="thead">${logo(t)}<span class="c">${t}</span><em>${ns.length}명</em></div><div class="plist">${ns.map(pr).join('')}</div>`).join('') || `<div class="empty">검색 결과가 없어요</div>`;
+    }
+    el.querySelector('#sb').innerHTML = h;
+  };
+  el._draw = draw; el.querySelector('#sq').addEventListener('input', draw); draw();
+}
+function fanSheet(i){ // 팬을 누르면 어떤 선수를 눌렀는지
+  const f = FANS[i]; if(!f) return;
+  const keys = Object.keys(P).filter(k => k !== f.main);
+  const off = (f.n.charCodeAt(0) + f.rank*3) % keys.length;
+  const order = [f.main, ...keys.slice(off), ...keys.slice(0,off)].slice(0,5), sh = [.46,.24,.15,.09,.06];
+  let left = f.v; const rows = order.map((n,k) => { const v = k===4 ? left : Math.round(f.v*sh[k]); left -= v; return {n, v}; });
+  openSheet(`<div class="sheet" role="dialog" aria-label="팬 응원 기록"><div class="sh-h"><span class="t">${f.me?'내 응원 기록':f.n}</span><span class="x" data-close>닫기</span></div><div class="sh-b">
+    <div class="fd-sum"><div class="fan-av lg">${f.me?'나':f.n[0]}</div><div><div class="fd-n">${f.me?'나':f.n}</div><div class="fd-s">${f.rank}위 · 누적 응원 <b>${fmt(f.v)}</b>회</div></div></div>
+    <div class="ghead">응원한 선수 <em>많이 누른 순</em></div>
+    <div class="plist">${rows.map(x => `<div class="pr">${pref(x.n)}<div class="b"><div class="n">${x.n}<small>${P[x.n].team} · ${P[x.n].pos}</small></div><div class="fd-bar"><i style="width:${Math.round(x.v/rows[0].v*100)}%"></i></div></div><div class="v">${FL}${fmt(x.v)}</div></div>`).join('')}</div>
+    <div class="note">응원 대상은 랭킹에 오른 팬에게만 공개돼요. 비공개는 설정에서 바꿀 수 있어요.</div></div></div>`);
+}
+
+/* ---------- 이벤트 ---------- */
+document.addEventListener('click', e => {
+  const t = e.target;
+  if(t.closest('[data-close]') || t.id === 'sheet'){ closeSheet(); return; }
+  const rk = t.closest('[data-rank]');
+  if(rk){ Object.assign(STATE, {mode:'f', pl:rk.dataset.rank, shown:20}); closeSheet(); renderRank(); document.getElementById('rank').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  const stab = t.closest('[data-stab]'); if(stab){ sheetTab = stab.dataset.stab; document.getElementById('sheet')._draw(); return; }
+  const mo = t.closest('[data-more]'); if(mo){ STATE.shown += 20; renderRank(); return; }
+  const pf = t.closest('[data-pf]'); if(pf){ STATE.pf = pf.dataset.pf; closeSheet(); renderRank(); return; }
+  const pk = t.closest('[data-pick]'); if(pk){ STATE.pl = pk.dataset.pick; STATE.shown = 20; closeSheet(); renderRank(); return; }
+  const fn = t.closest('[data-fan]'); if(fn){ fanSheet(+fn.dataset.fan); return; }
+  const op = t.closest('[data-open]'); if(op){ op.dataset.open === 'pf' ? filterSheet() : playerSheet(); return; }
+  const r = t.closest('#rank [data-rk]');
+  if(r){ const [k,v] = r.dataset.rk.split(':'); if(k==='goto'){ STATE.mode='f'; STATE.pl=v; } else STATE[k] = v; STATE.shown = 20; renderRank(); }
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSheet(); });
+
+/* 응원: 누르면 바로 올라가고, 다른 팬의 응원은 흉내만 낸다 */
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let heat = .2, crowd = .2;
+function paint(bump, who){
+  document.querySelectorAll('.total').forEach(el => { el.textContent = fmt(CHEER[el.dataset.p]); if(bump && el.dataset.p === who && !still){ el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); } });
+  document.querySelectorAll('.mine').forEach(el => { el.textContent = '+' + fmt(MINE[el.dataset.p] || 0); });
+}
+function tap(btn){
+  const n = btn.dataset.cheer; CHEER[n]++; MINE[n] = (MINE[n] || 0) + 1;
+  heat = Math.min(1, heat + .07); document.documentElement.style.setProperty('--heat', heat.toFixed(2));
+  if(!still){ const f = document.createElement('span'); f.className = 'fx'; f.textContent = '+1'; f.style.setProperty('--dx', (Math.random()*44-22).toFixed(0) + 'px'); btn.parentNode.appendChild(f); f.addEventListener('animationend', () => f.remove()); }
+  paint(true, n);
+}
+let hold = null;
+document.addEventListener('pointerdown', e => { const b = e.target.closest('.cbtn'); if(!b) return; e.preventDefault(); b.classList.add('down'); tap(b); clearInterval(hold); hold = setInterval(() => tap(b), 130); });
+['pointerup','pointercancel'].forEach(ev => document.addEventListener(ev, () => { clearInterval(hold); document.querySelectorAll('.cbtn.down').forEach(b => b.classList.remove('down')); }));
+setInterval(() => {
+  crowd = Math.max(.12, Math.min(.42, crowd + (Math.random()-.5)*.08));
+  Object.keys(CHEER).forEach(n => CHEER[n] += Math.floor(1 + Math.random()*(n==='Faker' ? 12 : 5)));
+  heat = Math.max(crowd, heat - .035); document.documentElement.style.setProperty('--heat', heat.toFixed(2)); paint(false);
+}, 400);
+
+/* 솔랭 경과 시간 */
+const clk = v => Math.floor(v/60) + ':' + String(v%60).padStart(2,'0');
+setInterval(() => document.querySelectorAll('.clk').forEach(e => { e.dataset.t = +e.dataset.t + 1; e.textContent = clk(+e.dataset.t); }), 1000);
+
+document.getElementById('phones').innerHTML = home() + rankPhone();
+document.querySelectorAll('.clk').forEach(e => e.textContent = clk(+e.dataset.t));
+</script>
+</body>
+</html>
