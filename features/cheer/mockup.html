@@ -216,13 +216,11 @@ svg{display:block}
 .share .a{background:var(--narPink700)}
 .share .b{background:var(--narChipActive)}
 .pct{display:flex;justify-content:space-between;padding:5px 15px 0;font:700 11.5px var(--os);color:var(--narGray400);font-variant-numeric:tabular-nums}
-.mbtns{display:flex;gap:8px;padding:12px 12px 0}
+.mbtns{display:flex;gap:8px;padding:12px 12px 14px}
 .mbtns .bw{flex:1}
 .mbtns .cbtn{width:100%;justify-content:center;padding:0}
 .cbtn.a{background:var(--narPink700)}
 .cbtn.b{background:var(--narChipActive)}
-.cbtn.off{background:var(--narDark500);color:var(--narDark200)}
-.mnote{padding:9px 15px 12px;font-size:11.5px;color:var(--narDark200);text-align:center}
 
 @media(max-width:430px){.wrap{padding:16px 8px 56px}.phone{width:100%;max-width:375px}}
 @media(prefers-reduced-motion:reduce){.fx{display:none}.total.bump,.champtag b{animation:none}.hcol{transition:none}}
@@ -331,8 +329,7 @@ function matchCard(m){
       <div class="share"><i class="a"></i><i class="b"></i></div>
       <div class="pct"><span class="pa"></span><span class="pb"></span></div>
       <div class="mbtns">${btn(m.a,'a')}${btn(m.b,'b')}</div>
-      <div class="mnote">한 경기에 한 팀만 응원해요. 처음 누른 팀으로 정해져요</div>
-      ${m.rank ? `<div class="cfoot" role="button" tabindex="0"><span class="t">이 경기 응원 랭킹</span><span class="go">내 순위 <b>${m.rank}위</b>${chev}</span></div>` : ''}
+      <div class="cfoot" role="button" tabindex="0"><span class="t">경기 상세</span><span class="go">${m.live ? '라이브 보기' : '라인업·전적 보기'}${chev}</span></div>
     </div>
   </div>`;
 }
@@ -496,7 +493,7 @@ function paint(bump, who){
   document.querySelectorAll('.mine').forEach(el => { el.textContent = '+' + fmt(MINE[el.dataset.p] || 0); });
 }
 function tap(btn){
-  const n = btn.dataset.cheer, mc = btn.closest('.mcard');
+  const n = btn.dataset.cheer;
   if(mc){ // 한 경기에 한 팀만: 처음 누른 팀으로 고정
     if(mc.dataset.side && mc.dataset.side !== n) return;
     mc.dataset.side = n;
@@ -520,7 +517,7 @@ setInterval(() => {
 const clk = v => Math.floor(v/60) + ':' + String(v%60).padStart(2,'0');
 setInterval(() => document.querySelectorAll('.clk').forEach(e => { e.dataset.t = +e.dataset.t + 1; e.textContent = clk(+e.dataset.t); }), 1000);
 
-document.getElementById('phones').innerHTML = home() + rankPhone() + home('월즈 기간 홈', '경기 카드도 같은 자리에 붙는다 · 양팀 중 한 팀을 눌러보기', [...MATCH.map(matchCard), card(LIVE[0])], 3);
+document.getElementById('phones').innerHTML = home() + rankPhone() + home('월즈 기간 홈', '경기 카드도 같은 자리에 붙는다 · 양팀 버튼을 눌러보기', [...MATCH.map(matchCard), card(LIVE[0])], 3);
 paint(false);
 document.querySelectorAll('.clk').forEach(e => e.textContent = clk(+e.dataset.t));
 </script>
