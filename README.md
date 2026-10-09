@@ -64,6 +64,6 @@ python3 scripts/sync-tokens.py
 | 기능 | 상태 |
 |---|---|
 | [홈 화면 개편](features/home/spec.md) · [목업](features/home/mockup.html) | 초안 |
-| [응원 버튼](features/cheer/spec.md) · [목업](features/cheer/mockup.html) | 초안 |
+| [응원 버튼](features/cheer/spec.md) · [목업](features/cheer/mockup.html) · [나중에 확장](features/cheer/mockup-later.html) | 초안 |
 | [쇼츠 (앱 안 재생)](features/shorts/spec.md) · [목업](features/shorts/mockup.html) | 초안 |
 | [광고판 (자체 광고 슬롯)](features/ad-slots/spec.md) · [목업](features/ad-slots/mockup.html) | 초안 |
