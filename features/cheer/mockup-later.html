@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Warding 응원 버튼 (솔랭 전용)</title>
+<title>Warding 응원 버튼 (나중에: 월즈 경기·랭킹)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="../../assets/tokens.css">
 <style>
@@ -256,7 +256,7 @@ svg{display:block}
 
 @media(max-width:430px){.wrap{padding:16px 8px 56px}.phone{width:100%;max-width:375px}}
 @media(prefers-reduced-motion:reduce){.spark{display:none}.fx{display:none}.total.bump,.champtag b{animation:none}.hcol{transition:none}}
-.hcol{height:auto}.hcol > .cheer{flex:none}.hcol > .cheer .crow{flex:none;height:74px}</style>
+</style>
 </head>
 <body>
 
@@ -268,7 +268,7 @@ svg{display:block}
 
 <div class="wrap">
   <h1>Warding 응원 버튼</h1>
-  <p class="lede">홈의 솔랭 카드 아래에 응원 버튼과 화력 숫자만 붙인 목업이다. 랭킹 화면은 데이터가 쌓인 뒤 별도 페이지로 만든다. 선수 사진·챔피언 스플래시·팀 로고는 실데이터이고, <b>응원 수치·순위·팬 닉네임은 전부 예시</b>다. 버튼을 눌러보고, 카드를 옆으로 넘기면 다른 선수가 나온다.</p>
+  <p class="lede">홈의 솔랭 카드 아래에 응원 영역을 붙이고, 응원 랭킹 화면(선수·팬)을 더한 목업이다. 선수 사진·챔피언 스플래시·팀 로고는 실데이터이고, <b>응원 수치·순위·팬 닉네임은 전부 예시</b>다. 버튼을 눌러보고, 카드 아래 <b>응원 랭킹</b> 줄을 누르면 오른쪽 폰이 그 선수 팬 랭킹으로 열린다.</p>
   <div class="row" id="phones"></div>
 </div>
 
@@ -335,6 +335,7 @@ function card([name, champ, champKo, from]){
         </div>
         <div class="bw"><button class="cbtn" type="button" data-cheer="${name}" aria-label="${name} 응원하기">${FL}응원하기</button></div>
       </div>
+      <div class="cfoot" role="button" tabindex="0" data-rank="${name}"><span class="t">응원 랭킹</span><span class="go">내 순위 <b>${MYRANK[name]}위</b>${chev}</span></div>
     </div>
   </div>`;
 }
@@ -584,7 +585,7 @@ setInterval(() => {
 const clk = v => Math.floor(v/60) + ':' + String(v%60).padStart(2,'0');
 setInterval(() => document.querySelectorAll('.clk').forEach(e => { e.dataset.t = +e.dataset.t + 1; e.textContent = clk(+e.dataset.t); }), 1000);
 
-document.getElementById('phones').innerHTML = home('홈', '솔랭 카드 하단에 응원 버튼만 붙는다 · 눌러보기');
+document.getElementById('phones').innerHTML = home() + rankPhone() + home('월즈 기간 홈', '경기 카드 위쪽은 경기 상세로 간다 · 응원 버튼과 랭킹 줄을 눌러보기', [...MATCH.map(matchCard), card(LIVE[0])], 3);
 paint(false);
 document.querySelectorAll('.clk').forEach(e => e.textContent = clk(+e.dataset.t));
 </script>
