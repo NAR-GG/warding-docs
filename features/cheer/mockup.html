@@ -494,12 +494,7 @@ function paint(bump, who){
 }
 function tap(btn){
   const n = btn.dataset.cheer;
-  if(mc){ // 한 경기에 한 팀만: 처음 누른 팀으로 고정
-    if(mc.dataset.side && mc.dataset.side !== n) return;
-    mc.dataset.side = n;
-    mc.querySelectorAll('.cbtn').forEach(b => b.classList.toggle('off', b.dataset.cheer !== n));
-    mc.querySelector('.mnote').textContent = n + ' 응원 중 · 이 경기는 바꿀 수 없어요';
-  } CHEER[n]++; MINE[n] = (MINE[n] || 0) + 1;
+  CHEER[n]++; MINE[n] = (MINE[n] || 0) + 1;
   heat = Math.min(1, heat + .07); document.documentElement.style.setProperty('--heat', heat.toFixed(2));
   if(!still){ const f = document.createElement('span'); f.className = 'fx'; f.textContent = '+1'; f.style.setProperty('--dx', (Math.random()*44-22).toFixed(0) + 'px'); btn.parentNode.appendChild(f); f.addEventListener('animationend', () => f.remove()); }
   paint(true, n);
