@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warding 후원 안내 페이지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="../../assets/tokens.css">
+<style>
+/* 색은 ../../assets/tokens.css 변수만 쓴다. hex 직접 금지. 결정·미결은 spec.md. */
+:root{
+  --ui:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --os:"Open Sans",-apple-system,"Noto Sans KR",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--gray100);color:var(--narText);font-family:var(--ui);font-size:14px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:36px 24px 72px}
+h1{font-size:24px;font-weight:700;margin:0 0 6px}
+.lede{color:var(--narText2);margin:0 0 26px;max-width:74ch}
+.lede b{color:var(--narText);font-weight:500}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:10px;width:375px}
+.cap{font-family:var(--os);font-weight:600;font-size:13px;color:var(--narText3)}
+.cap em{font-style:normal;color:var(--narViolet3)}
+.note{color:var(--narText2);font-size:12px;line-height:1.55}
+.note b{color:var(--narText3);font-weight:500}
+
+/* 폰 375px. 공지 상세는 한 화면이 길어서 두 장으로 나눠 이어 보여준다 */
+.phone{width:375px;height:760px;background:var(--narDark800);border:1px solid var(--narLine2);border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.sb{height:47px;flex:0 0 47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-family:var(--os);font-weight:600;font-size:14px;position:relative;z-index:2;background:var(--narDark800)}
+.hd{height:48px;flex:0 0 48px;display:flex;align-items:center;padding:0 20px;font-weight:600;font-size:16px;position:relative;z-index:2;background:var(--narDark800)}
+.hd .bk{position:absolute;left:20px;font-size:20px;color:var(--narTextTertiary)}
+.hd .tt{flex:1;text-align:center;color:var(--narTextTertiary)}
+.hd .ls{position:absolute;right:20px;font-weight:500;font-size:14px;color:var(--narTextTertiary)}
+.vp{flex:1;overflow:hidden;position:relative}
+.sc{padding:8px 20px 40px}
+
+/* 공지 상세 본문 — notice_detail_screen.dart 값: 제목 19/700, 메타 12.5, 본문 14/1.6, 소제목 15/700 */
+.nt{font-size:19px;font-weight:700;line-height:1.35;color:var(--narTextTertiary)}
+.nm{font-size:12.5px;font-weight:500;color:var(--narText2);margin:8px 0 14px}
+hr{border:0;border-top:1px solid var(--narLine);margin:0 0 16px}
+.b{font-size:14px;line-height:1.6;color:var(--narText3)}
+.b p{margin:0 0 10px}
+.b h2{font-size:15px;font-weight:700;line-height:1.5;color:var(--narTextTertiary);margin:18px 0 6px}
+.b ul{list-style:none;margin:0 0 10px;padding:0}
+.b li{display:flex;gap:6px}
+.b li::before{content:"•"}
+.b a{color:var(--narLinkText);text-decoration:underline}
+.b strong{font-weight:700}
+
+/* 표 — 새로 추가하는 렌더링. 헤더 행 배경 narDark600, 선 narLine, 셀 13px */
+.tb{width:100%;border-collapse:separate;border-spacing:0;margin:4px 0 12px;border:1px solid var(--narLine);border-radius:8px;overflow:hidden;font-size:13px;line-height:1.5}
+.tb th{background:var(--narDark600);color:var(--narTextTertiary);font-weight:600;text-align:left;padding:8px 10px}
+.tb td{color:var(--narText3);padding:8px 10px;border-top:1px solid var(--narLine);vertical-align:top}
+.tb td:first-child{color:var(--narTextTertiary);font-weight:600;white-space:nowrap}
+.tag{display:inline-block;padding:0 6px;border-radius:4px;background:var(--narChipActive);color:var(--narText);font-size:11px;font-weight:600;line-height:18px;margin-left:4px}
+.shift{transform:translateY(-560px)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>후원 안내 페이지</h1>
+  <p class="lede">후원 배너를 누르면 열리는 <b>공지 상세 화면</b>이다. 백오피스에서 공지로 작성하고, 같은 공지를 수정해서 가격과 규격을 바꾼다. 본문은 공지가 지원하는 마크다운(소제목, 리스트, 굵게, 링크)과 <b>새로 추가하는 표</b>로 쓴다. 가격, 규격 수치, 문구는 모두 예시다.</p>
+
+  <div class="row">
+    <div class="col">
+      <div class="cap"><em>①</em> 처음 보이는 화면</div>
+      <div class="phone">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="hd"><span class="bk">&#8249;</span><span class="tt">공지사항</span></div>
+        <div class="vp"><div class="sc">
+          <div class="nt">와딩 후원 안내</div>
+          <div class="nm">관리자 · 2026.10.10 12:00</div>
+          <hr>
+          <div class="b">
+            <p>와딩은 LoL e스포츠 일정과 알림을 모아 보여주는 앱입니다. 와딩에 배너를 싣고 싶은 팀, 채널, 스트리머, 서비스를 기다립니다.</p>
+            <h2>배너 상품</h2>
+            <table class="tb">
+              <tr><th>상품</th><th>위치</th><th>가격</th></tr>
+              <tr><td>홈 배너</td><td>홈 순위표 아래</td><td>시범 기간 문의</td></tr>
+              <tr><td>경기리스트 배너</td><td>날짜 사이</td><td>시범 기간 문의</td></tr>
+              <tr><td>진입 시트</td><td>하루 첫 진입</td><td>시범 기간 문의</td></tr>
+            </table>
+            <ul>
+              <li><span>기간은 <strong>1일 단위</strong>로 신청합니다.</span></li>
+              <li><span>같은 위치, 같은 날짜에는 한 광고주만 싣습니다. 결제 순서로 정합니다.</span></li>
+            </ul>
+            <h2>소재 규격</h2>
+            <table class="tb">
+              <tr><th>상품</th><th>크기</th><th>용량</th></tr>
+              <tr><td>홈·경기리스트</td><td>335×100<br>(2배 이미지 670×200)</td><td>300KB 이하</td></tr>
+              <tr><td>진입 시트</td><td>375 폭 가로형</td><td>300KB 이하</td></tr>
+            </table>
+          </div>
+        </div></div>
+      </div>
+      <div class="note"><b>상단 헤더</b>는 기존 공지 상세와 같다. 제목 19, 본문 14, 소제목 15. 가격표와 규격은 <b>표</b>로, 규칙은 리스트로 쓴다.</div>
+    </div>
+
+    <div class="col">
+      <div class="cap"><em>②</em> 아래로 스크롤</div>
+      <div class="phone">
+        <div class="sb"><span>9:41</span><span>●●●</span></div>
+        <div class="hd"><span class="bk">&#8249;</span><span class="tt">공지사항</span></div>
+        <div class="vp"><div class="sc shift">
+          <div class="nt">와딩 후원 안내</div>
+          <div class="nm">관리자 · 2026.10.10 12:00</div>
+          <hr>
+          <div class="b">
+            <p>와딩은 LoL e스포츠 일정과 알림을 모아 보여주는 앱입니다. 와딩에 배너를 싣고 싶은 팀, 채널, 스트리머, 서비스를 기다립니다.</p>
+            <h2>배너 상품</h2>
+            <table class="tb">
+              <tr><th>상품</th><th>위치</th><th>가격</th></tr>
+              <tr><td>홈 배너</td><td>홈 순위표 아래</td><td>시범 기간 문의</td></tr>
+              <tr><td>경기리스트 배너</td><td>날짜 사이</td><td>시범 기간 문의</td></tr>
+              <tr><td>진입 시트</td><td>하루 첫 진입</td><td>시범 기간 문의</td></tr>
+            </table>
+            <ul>
+              <li><span>기간은 <strong>1일 단위</strong>로 신청합니다.</span></li>
+              <li><span>같은 위치, 같은 날짜에는 한 광고주만 싣습니다. 결제 순서로 정합니다.</span></li>
+            </ul>
+            <h2>소재 규격</h2>
+            <table class="tb">
+              <tr><th>상품</th><th>크기</th><th>용량</th></tr>
+              <tr><td>홈·경기리스트</td><td>335×100<br>(2배 이미지 670×200)</td><td>300KB 이하</td></tr>
+              <tr><td>진입 시트</td><td>375 폭 가로형</td><td>300KB 이하</td></tr>
+            </table>
+            <ul>
+              <li><span>PNG, JPG 형식입니다. 와딩은 소재를 제작하지 않습니다.</span></li>
+            </ul>
+            <h2>신청 방법</h2>
+            <ul>
+              <li><span><strong>문의</strong> 아래 문의 폼에 위치, 기간, 소재를 보내 주세요.</span></li>
+              <li><span><strong>심의</strong> 내용이 기준에 맞는지 확인합니다.</span></li>
+              <li><span><strong>결제</strong> 안내받은 방법으로 사전 결제합니다.</span></li>
+              <li><span><strong>게시</strong> 기간 동안 앱에 노출됩니다.</span></li>
+              <li><span><strong>리포트</strong> 끝나면 노출과 클릭 수를 알려 드립니다.</span></li>
+            </ul>
+            <h2>실을 수 없는 내용</h2>
+            <ul>
+              <li><span>도박, 성인, 주류, 경쟁 서비스 홍보</span></li>
+              <li><span>사실과 다르거나 오해를 부르는 내용</span></li>
+            </ul>
+            <h2>문의</h2>
+            <p><a>광고 문의하기</a></p>
+          </div>
+        </div></div>
+      </div>
+      <div class="note"><b>문의 링크</b>는 외부 브라우저로 문의 폼을 연다. 계좌 안내는 앱 화면에 싣지 않고, 문의 뒤에 개별로 안내한다.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
