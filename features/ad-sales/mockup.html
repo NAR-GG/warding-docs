@@ -55,12 +55,12 @@ h1{font-size:24px;font-weight:700;margin:0 0 6px}
 .sec .tt{font-weight:700;font-size:14px;margin-bottom:8px}
 .rk{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-top:1px solid var(--narLine);color:var(--narText3)}
 
-/* 광고주 모집 배너 — 앱 AdvertiserBanner 와 같은 값: 반경 10, 패딩 가로16 세로14, 제목 15/600, 본문 13 */
-.adv{margin:28px 20px 0;padding:14px 16px;border-radius:10px;background:var(--narBgSecondary);border:1px solid var(--narLine);display:flex;align-items:center;gap:8px}
-.adv .tx{flex:1}
-.adv .a{font-weight:600;font-size:15px;line-height:1.4;color:var(--narText)}
-.adv .b{font-weight:400;font-size:13px;line-height:1.4;color:var(--narText2);margin-top:2px}
-.adv .c{font-size:20px;line-height:1;color:var(--narText2)}
+/* 광고주 모집 배너 — 앱 AdvertiserBanner 와 같은 값: 브랜드 그라데이션(narBg), 반경 14, 패딩 18/16, 제목 18/700, 부제 12.5 */
+.adv{margin:28px 20px 0;padding:16px 18px;border-radius:14px;background:var(--narBg);display:flex;align-items:center;gap:12px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--narText) 22%,transparent)}
+.adv .tx{flex:1;min-width:0}
+.adv .a{font-weight:700;font-size:18px;line-height:1.3;color:var(--narText)}
+.adv .b{font-weight:500;font-size:12.5px;line-height:1.4;color:var(--narText);opacity:.85;margin-top:3px}
+.adv .c{flex:0 0 28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--narText) 22%,transparent);display:grid;place-items:center;font-size:18px;line-height:1;color:var(--narText)}
 .adv.list{margin:16px 20px 8px}
 .slot{position:absolute;right:10px;bottom:-9px;padding:0 8px;border-radius:999px;background:var(--narChipActive);color:var(--narText);font-family:var(--os);font-size:10px;font-weight:600;line-height:18px;z-index:2}
 </style>
@@ -68,7 +68,7 @@ h1{font-size:24px;font-weight:700;margin:0 0 6px}
 <body>
 <div class="wrap">
   <h1>광고주 모집 배너</h1>
-  <p class="lede">AdMob을 걷은 자리에 들어가는 배너다. 누르면 문의 폼이 열린다. <b>모바일 PR #336의 실제 위젯 값(반경 10, 패딩 14/16, 제목 15, 본문 13)을 그대로 옮겼다.</b> 순위·경기·글 제목은 모두 예시다. 판매 구조는 <b>spec.md</b>.</p>
+  <p class="lede">AdMob을 걷은 자리에 들어가는 배너다. 누르면 문의 폼이 열린다. <b>모바일 PR #336의 실제 위젯 값(그라데이션 배경, 반경 14, 패딩 18/16, 제목 18)을 그대로 옮겼다.</b> 순위·경기·글 제목은 모두 예시다. 판매 구조는 <b>spec.md</b>.</p>
 
   <div class="row">
     <div class="col">
@@ -77,7 +77,7 @@ h1{font-size:24px;font-weight:700;margin:0 0 6px}
         <div class="sb"><span>9:41</span><span>●●●</span></div>
         <div class="body">
           <div class="sec"><div class="tt">순위표 · LCK</div><div class="rk"><span>1 T1</span><span>12-2</span></div><div class="rk"><span>2 GEN</span><span>11-3</span></div><div class="rk"><span>3 HLE</span><span>10-4</span></div></div>
-          <div class="adv" style="position:relative"><div class="tx"><div class="a">광고주 모집</div><div class="b">이 자리에 우리 팀·채널·서비스를 소개해 보세요</div></div><div class="c">&#8250;</div><span class="slot">home_inline</span></div>
+          <div class="adv" style="position:relative"><div class="tx"><div class="a">와딩에 광고하기</div><div class="b">팀 홍보 / 채널·스트리머 / 서비스 광고</div></div><div class="c">&#8250;</div><span class="slot">home_inline</span></div>
           <div class="h" style="padding-top:28px">커뮤니티</div>
           <div class="post"><div class="tt">예시 글 제목입니다</div><div class="m">예시닉 · 1시간 전</div></div>
           <div class="post"><div class="tt">또 다른 예시 글</div><div class="m">예시닉2 · 3시간 전</div></div>
@@ -96,7 +96,7 @@ h1{font-size:24px;font-weight:700;margin:0 0 6px}
           <div class="lg">LCK</div>
           <div class="card"><span class="t">17:00</span><span class="v">T1 vs GEN</span></div>
           <div class="card"><span class="t">19:30</span><span class="v">HLE vs KT</span></div>
-          <div class="adv list" style="position:relative"><div class="tx"><div class="a">광고주 모집</div><div class="b">이 자리에 우리 팀·채널·서비스를 소개해 보세요</div></div><div class="c">&#8250;</div><span class="slot">match_list_inline</span></div>
+          <div class="adv list" style="position:relative"><div class="tx"><div class="a">와딩에 광고하기</div><div class="b">팀 홍보 / 채널·스트리머 / 서비스 광고</div></div><div class="c">&#8250;</div><span class="slot">match_list_inline</span></div>
           <div class="day">10/11 (일)</div>
           <div class="lg">LCK</div>
           <div class="card"><span class="t">17:00</span><span class="v">DK vs BRO</span></div>
