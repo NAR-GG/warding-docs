@@ -65,6 +65,19 @@ h2 small{color:var(--narText2);font-weight:400;font-size:13px;margin-left:8px}
 .adv .c{flex:0 0 28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--narText) 22%,transparent);display:grid;place-items:center;font-size:18px;line-height:1;color:var(--narText)}
 .adv.list{margin:16px 20px 8px}
 .slot{position:absolute;right:10px;bottom:-9px;padding:0 8px;border-radius:999px;background:var(--narChipActive);color:var(--narText);font-family:var(--os);font-size:10px;font-weight:600;line-height:18px;z-index:2}
+
+/* 디자인 3안 */
+.d2{margin:28px 20px 0;padding:14px 16px;border-radius:12px;background:var(--narBgSecondary);border:1px solid var(--narLine2);display:flex;align-items:center;gap:12px}
+.d2 .tx{flex:1;min-width:0}
+.d2 .pill{display:inline-block;padding:0 6px;border-radius:4px;background:var(--narChipActive);color:var(--narText);font-size:10px;font-weight:600;line-height:16px;margin-bottom:6px}
+.d2 .a{font-weight:700;font-size:16px;line-height:1.3;color:var(--narText)}
+.d2 .b{font-size:12.5px;line-height:1.4;color:var(--narText2);margin-top:2px}
+.d2 .btn{flex:0 0 auto;padding:0 14px;height:34px;border-radius:8px;background:var(--narChipActive);color:var(--narText);font-weight:600;font-size:13px;display:grid;place-items:center}
+.d3{margin:28px 0 0;height:44px;padding:10px 16px;background:var(--narRatingBannerBg);display:flex;align-items:center;gap:8px}
+.d3 .a{font-weight:700;font-size:14px;color:var(--narText);white-space:nowrap}
+.d3 .b{flex:1;min-width:0;font-weight:500;font-size:13px;color:var(--narText3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d3 .c{font-size:18px;color:var(--narText)}
+.list-m{margin-top:16px!important;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -145,6 +158,57 @@ h2 small{color:var(--narText2);font-weight:400;font-size:13px;margin-left:8px}
       </div>
       <div class="note">날짜 3개마다 하나(두 번째 날짜 앞부터). 위 16, 아래 8.</div>
     </div>
+  </div>
+
+  <h2>디자인 3안 <small>문구는 '와딩 후원하기'로 고정해 비교한다. 문구는 위 A/B에서 고른 것으로 바꾼다</small></h2>
+  <div class="row">
+    <div class="col"><div class="cap">1. 그라데이션 카드 <span class="tag ok">지금 버전</span></div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="sec"><div class="tt">순위표 · LCK</div><div class="rk"><span>1 T1</span><span>12-2</span></div><div class="rk"><span>2 GEN</span><span>11-3</span></div><div class="rk"><span>3 HLE</span><span>10-4</span></div></div>
+<div class="adv"><div class="tx"><div class="a">와딩 후원하기</div><div class="b">개인배너 / 팀홍보 / 자유후원</div></div><div class="c">&#8250;</div></div>
+<div class="h" style="padding-top:28px">커뮤니티</div>
+<div class="post"><div class="tt">예시 글 제목입니다</div><div class="m">예시닉 · 1시간 전</div></div>
+<div class="post"><div class="tt">또 다른 예시 글</div><div class="m">예시닉2 · 3시간 전</div></div>
+<div class="nav"><span>경기일정</span><span>리스트</span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div><div class="note">브랜드 그라데이션, 제목 18. 가장 눈에 띈다. loawa 배너와 같은 결.</div></div>
+    <div class="col"><div class="cap">2. 라벨 + 버튼 카드</div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="sec"><div class="tt">순위표 · LCK</div><div class="rk"><span>1 T1</span><span>12-2</span></div><div class="rk"><span>2 GEN</span><span>11-3</span></div><div class="rk"><span>3 HLE</span><span>10-4</span></div></div>
+<div class="d2"><div class="tx"><span class="pill">후원</span><div class="a">와딩 후원하기</div><div class="b">개인배너 / 팀홍보 / 자유후원</div></div><div class="btn">문의하기</div></div>
+<div class="h" style="padding-top:28px">커뮤니티</div>
+<div class="post"><div class="tt">예시 글 제목입니다</div><div class="m">예시닉 · 1시간 전</div></div>
+<div class="post"><div class="tt">또 다른 예시 글</div><div class="m">예시닉2 · 3시간 전</div></div>
+<div class="nav"><span>경기일정</span><span>리스트</span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div><div class="note">다크 카드에 "후원" 라벨과 문의하기 버튼. 눌러야 하는 곳이 분명하다. 그라데이션보다 조용하다.</div></div>
+    <div class="col"><div class="cap">3. 얇은 띠</div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="sec"><div class="tt">순위표 · LCK</div><div class="rk"><span>1 T1</span><span>12-2</span></div><div class="rk"><span>2 GEN</span><span>11-3</span></div><div class="rk"><span>3 HLE</span><span>10-4</span></div></div>
+<div class="d3"><span class="a">와딩 후원하기</span><span class="b">개인배너 / 팀홍보 / 자유후원</span><span class="c">&#8250;</span></div>
+<div class="h" style="padding-top:28px">커뮤니티</div>
+<div class="post"><div class="tt">예시 글 제목입니다</div><div class="m">예시닉 · 1시간 전</div></div>
+<div class="post"><div class="tt">또 다른 예시 글</div><div class="m">예시닉2 · 3시간 전</div></div>
+<div class="nav"><span>경기일정</span><span>리스트</span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div><div class="note">높이 44. 기존 공지 띠배너(NarBanner)와 같은 크기와 그라데이션 20%. 자리를 가장 적게 차지하지만 공지처럼 보일 수 있다.</div></div>
+  </div>
+  <div class="row">
+    <div class="col"><div class="cap">1. 그라데이션 카드 · 경기리스트</div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="day">오늘 · 10/10 (토)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">T1 vs GEN</span></div>
+<div class="card"><span class="t">19:30</span><span class="v">HLE vs KT</span></div>
+<div class="adv list-m"><div class="tx"><div class="a">와딩 후원하기</div><div class="b">개인배너 / 팀홍보 / 자유후원</div></div><div class="c">&#8250;</div></div>
+<div class="day">10/11 (일)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">DK vs BRO</span></div>
+<div class="nav"><span>경기일정</span><span><b>리스트</b></span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div></div>
+    <div class="col"><div class="cap">2. 라벨 + 버튼 카드 · 경기리스트</div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="day">오늘 · 10/10 (토)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">T1 vs GEN</span></div>
+<div class="card"><span class="t">19:30</span><span class="v">HLE vs KT</span></div>
+<div class="d2 list-m"><div class="tx"><span class="pill">후원</span><div class="a">와딩 후원하기</div><div class="b">개인배너 / 팀홍보 / 자유후원</div></div><div class="btn">문의하기</div></div>
+<div class="day">10/11 (일)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">DK vs BRO</span></div>
+<div class="nav"><span>경기일정</span><span><b>리스트</b></span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div></div>
+    <div class="col"><div class="cap">3. 얇은 띠 · 경기리스트</div><div class="phone"><div class="sb"><span>9:41</span><span>●●●</span></div><div class="body">
+<div class="day">오늘 · 10/10 (토)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">T1 vs GEN</span></div>
+<div class="card"><span class="t">19:30</span><span class="v">HLE vs KT</span></div>
+<div class="d3 list-m"><span class="a">와딩 후원하기</span><span class="b">개인배너 / 팀홍보 / 자유후원</span><span class="c">&#8250;</span></div>
+<div class="day">10/11 (일)</div><div class="lg">LCK</div>
+<div class="card"><span class="t">17:00</span><span class="v">DK vs BRO</span></div>
+<div class="nav"><span>경기일정</span><span><b>리스트</b></span><span>커뮤니티</span><span>마이 구독</span><span>마이</span></div></div></div></div>
   </div>
 </div>
 </body>
