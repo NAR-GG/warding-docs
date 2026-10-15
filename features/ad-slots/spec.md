@@ -127,38 +127,57 @@
 
 ## 필요한 API · 데이터
 
-기존 광고 관련 코드는 백엔드에 없다. 공지 띠배너(`GET /api/notices/promoted`)는 있지만 광고에는 쓰지 않는다. 기간·광고주·노출 집계 개념이 없고, V62 마이그레이션 주석처럼 띠배너 열람은 집계도 안 된다.
+> **2026-10-15 갱신.** 아래 "제안" 중 **조회 API 와 링크 이동은 이미 구현됐다.** 실제 구현이
+> 이 문서의 초안과 달라진 부분이 있어 바로잡는다. 집계(`events`)는 아직 없다.
 
-| 데이터 | 엔드포인트 | 있음 / 새로 / 확인 필요 |
+### 구현된 것
+
+| 데이터 | 엔드포인트 | 상태 |
 |---|---|---|
-| 슬롯별 노출할 광고 | `GET /api/mobile/ads?slots=entry_sheet,home_inline` | 새로 |
-| 노출·클릭·닫기 기록 | `POST /api/mobile/ads/{adId}/events` | 새로 |
-| 광고 등록·기간·슬롯 배정 | 백오피스(`warding-backoffice-fe`) 화면 | 새로 |
+| 노출 중인 광고 | `GET /api/ads` | **있음** (`MobileAdController`) |
+| 광고 등록·기간·슬롯 배정 | `POST/PUT /api/admin/ads` | **있음** (`AdminAdController`) |
+| 외부 랜딩 열기 | `url_launcher` | **있음** — 앱의 `RegisteredAdCard` 가 처리 |
 | 공지 띠배너 | `GET /api/notices/promoted` | 있음. 광고와 분리해서 그대로 둔다 |
-| 이미지 저장 | Cloudinary | 있음. 업로드 흐름은 확인 필요 |
-| 외부 랜딩 열기 | `url_launcher`, 이미지는 `cached_network_image` | 있음(모바일 `pubspec.yaml`) |
+| 이미지 저장 | Cloudinary | 있음 |
 
-응답 예시(제안):
+실제 응답(`GET /api/ads`):
 
 ```json
-{
-  "ads": {
-    "entry_sheet": {
-      "adId": 101,
-      "imageUrl": "https://res.cloudinary.com/.../ad_101.png",
-      "landingUrl": "https://example.com/event",
-      "advertiserName": "예시 광고주",
-      "startsAt": "2026-10-10T00:00:00+09:00",
-      "endsAt": "2026-10-16T23:59:59+09:00"
-    },
-    "home_inline": null
+[
+  {
+    "id": 101,
+    "placement": "home",
+    "imageUrl": "https://res.cloudinary.com/.../ad_101.png",
+    "linkUrl": "https://example.com/event"
   }
-}
+]
 ```
 
-`null`이면 슬롯을 접는다. 서버가 하루 상한이나 유예 기간을 판단하지 않는다. 그건 기기에서 한다(서버는 사용자별 상태가 없다).
+초안과 다른 점:
 
-노출·클릭은 와딩이 직접 집계한다. 외부 광고 SDK나 광고 ID를 쓰지 않으므로 iOS 앱 추적 투명성(ATT) 대상이 아닌 것으로 본다. 다만 앱스토어 심사 기준은 **확인 필요**.
+- **필드명은 `landingUrl` 이 아니라 `linkUrl` 이다.** 백엔드 엔티티(`Ad.link_url`)·관리자
+  API·앱 모델이 모두 `linkUrl` 로 맞춰져 있다.
+- 경로가 `/api/mobile/ads` 가 아니라 **`/api/ads`** 다.
+- 슬롯별 맵이 아니라 **평평한 배열**이다. 앱이 `placement` 로 첫 건을 고른다
+  (`AdRepository.forPlacement`).
+- `advertiserName`·`startsAt`·`endsAt` 는 응답에 없다. 기간은 서버가 `findLive` 로
+  걸러서 **노출 중인 것만** 내려준다.
+- `placement` 값은 `home` · `match_list` · `match_detail` · `splash` · `popup` 이다.
+
+**`linkUrl` 이 비어 있으면 탭이 반응하지 않는다.** 광고를 등록할 때 넣지 않으면 이미지만
+보인다(의도된 동작이다).
+
+### 아직 없는 것
+
+| 데이터 | 엔드포인트 | 상태 |
+|---|---|---|
+| 노출·클릭·닫기 기록 | `POST /api/ads/{adId}/events` | **새로** |
+
+노출·클릭은 와딩이 직접 집계할 계획이다. 외부 광고 SDK나 광고 ID를 쓰지 않으므로 iOS 앱
+추적 투명성(ATT) 대상이 아닌 것으로 본다. 다만 앱스토어 심사 기준은 **확인 필요**.
+
+하루 상한이나 유예 기간은 서버가 판단하지 않는다. 그건 기기에서 한다(서버는 사용자별
+상태가 없다).
 
 ## 결정
 
